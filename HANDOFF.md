@@ -202,22 +202,6 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 
-## MCP Notes
-
-The Godot MCP Pro plugin starts successfully in Godot and connects to the Node backend:
-
-```text
-[MCP] Godot MCP Pro v1.14.1 started (ports 6505-6514)
-[MCP] Registered 171 commands
-```
-
-In this Codex session, long-lived `mcp__godot_mcp_pro` tool calls still report `Godot editor is not connected` even while TCP shows Godot connected to port 6505.
-The MCP CLI path works and can be used as a fallback:
-
-```powershell
-node C:\Users\admin\Desktop\godot-mcp-pro-v1.14.1\server\build\cli.js project info
-```
-
 ## Known Technical Debt
 
 - Config is JSON, not typed Godot Resources yet.
@@ -226,7 +210,6 @@ node C:\Users\admin\Desktop\godot-mcp-pro-v1.14.1\server\build\cli.js project in
 - UI uses static scene nodes but still placeholder panels/colors.
 - No save/load system exists yet.
 - No formal automated tests exist yet.
-- The long-lived MCP wrapper connection state needs investigation; CLI temporary-port connections are currently reliable.
 
 ## Suggested Next Steps
 
@@ -238,4 +221,3 @@ node C:\Users\admin\Desktop\godot-mcp-pro-v1.14.1\server\build\cli.js project in
 6. Add save/load.
 7. Replace placeholder map and UI visuals with project-style assets.
 8. Add smoke-test scenes or automated test helpers for the main loop.
-9. Investigate why the long-lived MCP wrapper does not refresh its connection state even though the Godot plugin connects to port 6505 and the CLI can connect through temporary ports.

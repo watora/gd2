@@ -57,7 +57,7 @@ func _cache_scene_nodes() -> void:
 		"herb_garden": %HerbGardenRow
 	}
 	for index: int in range(8):
-		_journal_labels.append(get_node("%JournalLabel%d" % index))
+		_journal_labels.append(get_node("%%JournalLabel%d" % index))
 	_character_name_labels = [%CharacterOneNameLabel, %CharacterTwoNameLabel]
 	_character_stat_labels = [%CharacterOneStatsLabel, %CharacterTwoStatsLabel]
 

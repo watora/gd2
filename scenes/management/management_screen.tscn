@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://management_demo_screen"]
+[gd_scene format=3 uid="uid://dc10g05brgidh"]
 
-[ext_resource type="Script" path="res://scripts/management/management_screen.gd" id="1_management"]
+[ext_resource type="Script" uid="uid://bpmqiumniglu0" path="res://scripts/management/management_screen.gd" id="1_management"]
 
-[node name="ManagementScreen" type="Control"]
+[node name="ManagementScreen" type="Control" unique_id=1831288723]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,7 +11,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_management")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="." unique_id=2143838226]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -20,7 +20,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.09, 0.1, 0.13, 1)
 
-[node name="ContentMargin" type="MarginContainer" parent="."]
+[node name="ContentMargin" type="MarginContainer" parent="." unique_id=1278836137]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -32,270 +32,280 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 
-[node name="Root" type="VBoxContainer" parent="ContentMargin"]
+[node name="Root" type="VBoxContainer" parent="ContentMargin" unique_id=21082268]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="TitleLabel" type="Label" parent="ContentMargin/Root"]
+[node name="TitleLabel" type="Label" parent="ContentMargin/Root" unique_id=964535425]
 layout_mode = 2
 theme_override_font_sizes/font_size = 30
 text = "Frontier Base"
 horizontal_alignment = 1
 
-[node name="StatsBar" type="HBoxContainer" parent="ContentMargin/Root"]
+[node name="StatsBar" type="HBoxContainer" parent="ContentMargin/Root" unique_id=1964366805]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="DayLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+[node name="DayLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=1920699837]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="GoldLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+[node name="GoldLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=2042590517]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="DungeonLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+[node name="DungeonLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=1278305958]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="IncomeLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+[node name="IncomeLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=903657323]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 horizontal_alignment = 1
 
-[node name="ActionsBar" type="HBoxContainer" parent="ContentMargin/Root"]
+[node name="ActionsBar" type="HBoxContainer" parent="ContentMargin/Root" unique_id=204009604]
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 2
 
-[node name="StartDungeonButton" type="Button" parent="ContentMargin/Root/ActionsBar"]
+[node name="StartDungeonButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1473799620]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Enter Dungeon"
 
-[node name="CharacterButton" type="Button" parent="ContentMargin/Root/ActionsBar"]
+[node name="CharacterButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1205082211]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Character Status"
 
-[node name="NextDayButton" type="Button" parent="ContentMargin/Root/ActionsBar"]
+[node name="NextDayButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=248490411]
 unique_name_in_owner = true
 layout_mode = 2
 text = "End Day"
 
-[node name="Body" type="HBoxContainer" parent="ContentMargin/Root"]
+[node name="Body" type="HBoxContainer" parent="ContentMargin/Root" unique_id=1659121044]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="BuildingPanel" type="PanelContainer" parent="ContentMargin/Root/Body"]
+[node name="BuildingPanel" type="PanelContainer" parent="ContentMargin/Root/Body" unique_id=897034807]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BuildingMargin" type="MarginContainer" parent="ContentMargin/Root/Body/BuildingPanel"]
+[node name="BuildingMargin" type="MarginContainer" parent="ContentMargin/Root/Body/BuildingPanel" unique_id=1356359632]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="BuildingRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin"]
+[node name="BuildingRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin" unique_id=1669781632]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="BuildingTitle" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot"]
+[node name="BuildingTitle" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=27533293]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Buildings"
 
-[node name="GuildHallRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot"]
+[node name="GuildHallRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=73237395]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow"]
+[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=108351402]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow"]
+[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=1725361539]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow"]
+[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=1653189919]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow"]
+[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow" unique_id=2059398407]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow"]
+[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow" unique_id=1271574416]
 layout_mode = 2
 
-[node name="WorkshopRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot"]
+[node name="WorkshopRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=642277976]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow"]
+[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=91919968]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow"]
+[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=769222443]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow"]
+[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=1805638724]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow"]
+[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow" unique_id=2030717692]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow"]
+[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow" unique_id=108413705]
 layout_mode = 2
 
-[node name="HerbGardenRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot"]
+[node name="HerbGardenRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=1851532350]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow"]
+[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=700705053]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow"]
+[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=388974589]
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow"]
+[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=1913876259]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow"]
+[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow" unique_id=678432635]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow"]
+[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow" unique_id=110501639]
 layout_mode = 2
 
-[node name="Side" type="VBoxContainer" parent="ContentMargin/Root/Body"]
-layout_mode = 2
+[node name="Side" type="VBoxContainer" parent="ContentMargin/Root/Body" unique_id=506210634]
 custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="InventoryPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side"]
+[node name="InventoryPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side" unique_id=235755752]
 layout_mode = 2
 
-[node name="InventoryMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel"]
+[node name="InventoryMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel" unique_id=1173852166]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="InventoryRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin"]
+[node name="InventoryRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin" unique_id=777802594]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="InventoryTitle" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="InventoryTitle" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=26413390]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Inventory"
 
-[node name="AncientShardLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="AncientShardLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=160216896]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="IronOreLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="IronOreLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=524381744]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="GlowingMossLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="GlowingMossLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=483335772]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MachineGearLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="MachineGearLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=912980630]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HealingPotionLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
+[node name="HealingPotionLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=155395429]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="JournalPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side"]
+[node name="JournalPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side" unique_id=1684544700]
+custom_minimum_size = Vector2(0, 280)
 layout_mode = 2
-size_flags_vertical = 3
 
-[node name="JournalMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/JournalPanel"]
+[node name="JournalMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/JournalPanel" unique_id=1162606508]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="JournalRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin"]
+[node name="JournalRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin" unique_id=125006208]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="JournalTitle" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalTitle" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot" unique_id=2147254635]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Journal"
 
-[node name="JournalLabel0" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalScroll" type="ScrollContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot" unique_id=2114576351]
+custom_minimum_size = Vector2(0, 210)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="JournalEntries" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll" unique_id=2133164071]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="JournalLabel0" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1762650812]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel1" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel1" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1594398297]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel2" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel2" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=726394969]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel3" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel3" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=307400654]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel4" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel4" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=267211459]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel5" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel5" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=2052870058]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel6" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel6" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1385817945]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel7" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
+[node name="JournalLabel7" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1218683909]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="CharacterPanel" type="PanelContainer" parent="."]
+[node name="CharacterPanel" type="PanelContainer" parent="." unique_id=2009140056]
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
@@ -309,50 +319,50 @@ offset_top = -220.0
 offset_right = 230.0
 offset_bottom = 220.0
 
-[node name="CharacterMargin" type="MarginContainer" parent="CharacterPanel"]
+[node name="CharacterMargin" type="MarginContainer" parent="CharacterPanel" unique_id=2141614600]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="CharacterRoot" type="VBoxContainer" parent="CharacterPanel/CharacterMargin"]
+[node name="CharacterRoot" type="VBoxContainer" parent="CharacterPanel/CharacterMargin" unique_id=827163868]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="CharacterHeader" type="HBoxContainer" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterHeader" type="HBoxContainer" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=653772006]
 layout_mode = 2
 
-[node name="CharacterTitle" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader"]
+[node name="CharacterTitle" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader" unique_id=1565427254]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "Character Status"
 
-[node name="CloseCharacterButton" type="Button" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader"]
+[node name="CloseCharacterButton" type="Button" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader" unique_id=258833915]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Close"
 
-[node name="CharacterOneNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterOneNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=429868669]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CharacterOneStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterOneStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=626001505]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="CharacterOneSeparator" type="HSeparator" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterOneSeparator" type="HSeparator" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=1793673097]
 layout_mode = 2
 
-[node name="CharacterTwoNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterTwoNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=97223308]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 
-[node name="CharacterTwoStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot"]
+[node name="CharacterTwoStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=774268817]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
