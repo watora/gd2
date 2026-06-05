@@ -3,6 +3,7 @@ extends Node
 
 const CHARACTERS_CONFIG := "res://data/config/characters.json"
 const SKILLS_CONFIG := "res://data/config/skills.json"
+const DEFAULT_SPEED := 100
 
 var character_config: Dictionary = {}
 var skill_config: Dictionary = {}
@@ -37,6 +38,9 @@ func has_skill(skill_id: String) -> bool:
 
 
 func _normalize_character(character: Dictionary) -> void:
+	if not character.has("speed"):
+		character["speed"] = DEFAULT_SPEED
+	character["speed"] = max(1, int(character["speed"]))
 	if not character.has("skills"):
 		character["skills"] = []
 	var valid_skills: Array[String] = []

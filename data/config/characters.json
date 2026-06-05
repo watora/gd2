@@ -14,6 +14,7 @@
       "strength": 7,
       "agility": 8,
       "intelligence": 6,
+      "speed": 100,
       "skills": ["power_strike", "quick_cut"]
     },
     {
@@ -30,6 +31,7 @@
       "strength": 4,
       "agility": 6,
       "intelligence": 9,
+      "speed": 150,
       "skills": ["arcane_bolt", "mana_spark"]
     }
   ]

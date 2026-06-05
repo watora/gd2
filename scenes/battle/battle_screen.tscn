@@ -70,6 +70,34 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 18
 
+[node name="ActionOrderPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 0)
+size_flags_vertical = 3
+
+[node name="ActionOrderMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="ActionOrderRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActionOrderTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Action Order"
+
+[node name="ActionOrderLabel" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(180, 220)
+size_flags_vertical = 3
+text = "Actor(0)"
+
 [node name="PartyPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField"]
 layout_mode = 2
 size_flags_horizontal = 3

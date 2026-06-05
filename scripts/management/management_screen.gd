@@ -10,7 +10,8 @@ const STAT_NAMES := {
 	"mp": "MP",
 	"strength": "STR",
 	"agility": "AGI",
-	"intelligence": "INT"
+	"intelligence": "INT",
+	"speed": "SPD"
 }
 
 const ITEM_LABELS := {

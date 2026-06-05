@@ -38,6 +38,8 @@ res://
     config/enemies.json
     config/items.json
     config/skills.json
+  tests/
+    unit/battle_action_order_smoke_test.gd
   Assets/
     bg/bg_dungeon_old_capital_map_placeholder.png
     bg/bg_dungeon_crystal_cavern_map_placeholder.png
@@ -98,6 +100,7 @@ Characters currently have:
 - `strength`
 - `agility`
 - `intelligence`
+- `speed`
 - `skills`: an array of skill ids loaded from `data/config/characters.json`
 
 The management screen has a `Character Status` button that opens a character status panel.
@@ -132,6 +135,7 @@ Level-up behavior:
 - Battle victory grants each living party member the total enemy EXP.
 - If `exp >= next_exp`, the character levels up.
 - Each level up increases `max_hp`, `max_mp`, `strength`, `agility`, and `intelligence`.
+- Each level up also increases `speed` by 2.
 - HP and MP are restored to the new maximum after level up.
 - Next level requirement is `20 + (level - 1) * 15`.
 
@@ -253,20 +257,29 @@ res://scripts/battle/battle_manager.gd
 ```
 
 `BattleScreen` owns battle UI display and input forwarding.
-`BattleManager` owns battle calculation, enemy config loading, active actor rotation, skill use, item use, enemy turns, victory/defeat checks, rewards, and EXP growth.
+`BattleManager` owns battle calculation, enemy config loading, speed-based action value ordering, skill use, item use, enemy actions, victory/defeat checks, rewards, and EXP growth.
 `DungeonScreen` instantiates `BattleScreen` when a dungeon event choice returns a `battle` result, then listens for `battle_finished(result: Dictionary)`.
+
+Characters and enemies have a `speed` field. The action value delay is:
+
+```text
+action_value = int(10000 / speed)
+```
+
+`BattleScreen` shows an `Action Order` panel on the left side of the battle field. It displays up to 10 upcoming entries as `Name(value)`. With speed 100 and 150, the smoke test verifies the preview starts as `B(66), A(100), B(132), A(200)`, then after B acts becomes `A(34), B(66), A(134)`.
 
 Battle flow:
 
 1. Dungeon event choice includes a `battle` dictionary.
 2. Selecting the choice hides the event panel and instantiates `BattleScreen`.
-3. Left side shows party members.
-4. Right side shows enemies.
-5. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
-6. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
-7. Enemy turn runs after all living party members act.
-8. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
-9. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
+3. Left side shows action order.
+4. Middle shows party members.
+5. Right side shows enemies.
+6. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
+7. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
+8. Enemy actions auto-resolve whenever an enemy is the next actor in the speed queue.
+9. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
+10. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
 
 Current battle choices:
 
@@ -309,6 +322,10 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 - During the battle, the top `Return to Base` button was disabled.
 - Aki used `Power Strike`, Mio used `Arcane Bolt`, and Aki finished the fight with `Attack`.
 - After victory, `BattleScreen` was removed, `MapLayer` became visible again, `Return to Base` was re-enabled, and the reward label showed `Run rewards: Gold x24, Iron Ore x1`.
+- Godot headless project load passed with `--headless --path . --quit`.
+- Godot editor headless load passed with `--headless --path . --editor --quit`.
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed and verifies speed 100/150 action order preview values before and after the first action.
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 
@@ -318,7 +335,7 @@ Older validation before the string-corruption fix also covered battle victory re
 - Some earlier handoff text and git history contain mojibake from prior Chinese display strings; current runtime UI strings are ASCII.
 - UI uses static scene nodes but still placeholder panels/colors.
 - No save/load system exists yet.
-- No formal automated tests exist yet.
+- Automated coverage is still minimal; only the battle action order smoke test exists.
 
 ## Suggested Next Steps
 

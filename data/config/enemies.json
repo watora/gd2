@@ -7,6 +7,7 @@
       "strength": 5,
       "agility": 7,
       "intelligence": 2,
+      "speed": 130,
       "exp": 12
     },
     "wandering_armor": {
@@ -16,6 +17,7 @@
       "strength": 6,
       "agility": 3,
       "intelligence": 1,
+      "speed": 80,
       "exp": 14
     },
     "shrine_guardian": {
@@ -25,6 +27,7 @@
       "strength": 7,
       "agility": 4,
       "intelligence": 5,
+      "speed": 90,
       "exp": 24
     }
   }
