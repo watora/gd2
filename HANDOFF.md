@@ -22,12 +22,15 @@ res://
     main/main.tscn
     management/management_screen.tscn
     dungeon/dungeon_screen.tscn
+    battle/battle_screen.tscn
   scripts/
     core/main_controller.gd
     core/character_manager.gd
     management/management_screen.gd
     dungeon/dungeon_screen.gd
     dungeon/dungeon_manager.gd
+    battle/battle_screen.gd
+    battle/battle_manager.gd
   data/
     config/buildings.json
     config/characters.json
@@ -171,10 +174,10 @@ res://scripts/dungeon/dungeon_screen.gd
 res://scripts/dungeon/dungeon_manager.gd
 ```
 
-The dungeon map, event buttons, event panel, choice buttons, battle panel, battle commands, and item button are defined in the scene file.
-`DungeonScreen` handles UI display, dynamic event buttons, map image presentation, and the current embedded battle overlay.
-`DungeonManager` handles dungeon config loading, enemy config loading, current map state, event resolution state, requirements checks, map travel, run rewards, run flags, and run summary.
-Click-open secondary panels now use explicit opaque `StyleBoxFlat` backgrounds in the scene files, including the management character panel, dungeon event panel, battle overlay, and battle item panel.
+The dungeon map, event buttons, event panel, and choice buttons are defined in the scene file.
+`DungeonScreen` handles UI display, dynamic event buttons, map image presentation, starting battle encounters, and applying battle results.
+`DungeonManager` handles dungeon config loading, current map state, event resolution state, requirements checks, map travel, run rewards, run flags, and run summary.
+Click-open secondary panels now use explicit opaque `StyleBoxFlat` backgrounds in the scene files, including the management character panel, dungeon event panel, battle screen, and battle item panel.
 
 Dungeon maps are config-driven:
 
@@ -236,19 +239,34 @@ The current repeatable travel events are:
 
 ## Battle
 
-Battle is currently implemented as an overlay inside `DungeonScreen`, not as a separate battle scene.
+Battle scene:
+
+```text
+res://scenes/battle/battle_screen.tscn
+```
+
+Scripts:
+
+```text
+res://scripts/battle/battle_screen.gd
+res://scripts/battle/battle_manager.gd
+```
+
+`BattleScreen` owns battle UI display and input forwarding.
+`BattleManager` owns battle calculation, enemy config loading, active actor rotation, skill use, item use, enemy turns, victory/defeat checks, rewards, and EXP growth.
+`DungeonScreen` instantiates `BattleScreen` when a dungeon event choice returns a `battle` result, then listens for `battle_finished(result: Dictionary)`.
 
 Battle flow:
 
 1. Dungeon event choice includes a `battle` dictionary.
-2. Selecting the choice hides the event panel and shows the battle overlay.
+2. Selecting the choice hides the event panel and instantiates `BattleScreen`.
 3. Left side shows party members.
 4. Right side shows enemies.
 5. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
 6. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
 7. Enemy turn runs after all living party members act.
-8. Victory adds battle rewards and EXP, then returns to dungeon map.
-9. Defeat ends the dungeon run and returns to base.
+8. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
+9. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
 
 Current battle choices:
 
@@ -286,6 +304,11 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 - Character status displayed Aki's `Power Strike, Quick Cut` skills and Mio's `Arcane Bolt, Mana Spark` skills.
 - In battle, clicking `Skill` for Aki displayed `Power Strike` and `Quick Cut`; selecting `Power Strike` spent 4 MP and dealt configured STR-scaling damage.
 - On Mio's turn, clicking `Skill` displayed `Arcane Bolt` and `Mana Spark`; selecting `Arcane Bolt` spent 5 MP and dealt configured INT-scaling damage.
+- Runtime scene-tree inspection confirmed `DungeonScreen` no longer contains the old `BattleLayer` subtree.
+- Selecting `Fight the shadow patrol` instantiated `/root/Main/DungeonScreen/BattleScreen` with child `/root/Main/DungeonScreen/BattleScreen/BattleManager`.
+- During the battle, the top `Return to Base` button was disabled.
+- Aki used `Power Strike`, Mio used `Arcane Bolt`, and Aki finished the fight with `Attack`.
+- After victory, `BattleScreen` was removed, `MapLayer` became visible again, `Return to Base` was re-enabled, and the reward label showed `Run rewards: Gold x24, Iron Ore x1`.
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 
@@ -293,7 +316,6 @@ Older validation before the string-corruption fix also covered battle victory re
 
 - Config is JSON, not typed Godot Resources yet.
 - Some earlier handoff text and git history contain mojibake from prior Chinese display strings; current runtime UI strings are ASCII.
-- Battle is embedded in `DungeonScreen`; it should eventually move to `scenes/battle/` and `scripts/battle/`.
 - UI uses static scene nodes but still placeholder panels/colors.
 - No save/load system exists yet.
 - No formal automated tests exist yet.
@@ -301,10 +323,9 @@ Older validation before the string-corruption fix also covered battle victory re
 ## Suggested Next Steps
 
 1. Convert JSON configs into typed Godot Resources or add schema validation.
-2. Move battle logic into a dedicated battle scene/controller.
-3. Add proper target selection for attacks, skills, and items.
-4. Add skill definitions instead of one hardcoded skill action.
-5. Add HP/MP recovery rules when ending a day.
-6. Add save/load.
-7. Replace placeholder map and UI visuals with project-style assets.
-8. Add smoke-test scenes or automated test helpers for the main loop.
+2. Add proper target selection for attacks, skills, and items.
+3. Add more skill effects beyond direct damage.
+4. Add HP/MP recovery rules when ending a day.
+5. Add save/load.
+6. Replace placeholder map and UI visuals with project-style assets.
+7. Add smoke-test scenes or automated test helpers for the main loop.

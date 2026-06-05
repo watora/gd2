@@ -2,7 +2,6 @@ class_name DungeonManager
 extends Node
 
 const EVENTS_CONFIG := "res://data/config/dungeon_events.json"
-const ENEMIES_CONFIG := "res://data/config/enemies.json"
 
 const STAT_NAMES := {
 	"hp": "HP",
@@ -16,7 +15,6 @@ var state: Dictionary = {}
 var dungeon_config: Dictionary = {}
 var map_config: Dictionary = {}
 var event_config: Dictionary = {}
-var enemy_config: Dictionary = {}
 var run_rewards: Dictionary = {"gold": 0}
 var run_flags: Dictionary = {}
 var run_summary: Array[String] = []
@@ -110,12 +108,6 @@ func travel_to_map(travel_data: Dictionary) -> Dictionary:
 	return {"ok": true}
 
 
-func enemy_data(enemy_id: String) -> Dictionary:
-	if enemy_config.has(enemy_id):
-		return enemy_config[enemy_id].duplicate(true)
-	return {}
-
-
 func meets_requirements(requirements: Dictionary) -> bool:
 	if requirements.is_empty():
 		return true
@@ -154,7 +146,6 @@ func _load_configs() -> void:
 	dungeon_config = _load_json(EVENTS_CONFIG)
 	map_config = dungeon_config.get("maps", {})
 	event_config = dungeon_config.get("events", {})
-	enemy_config = _load_json(ENEMIES_CONFIG).get("enemies", {})
 
 
 func _initialize_run_rewards() -> void:
