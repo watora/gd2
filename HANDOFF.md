@@ -266,7 +266,7 @@ Characters and enemies have a `speed` field. The action value delay is:
 action_value = int(10000 / speed)
 ```
 
-`BattleScreen` shows an `Action Order` panel on the left side of the battle field. It displays up to 10 upcoming entries as `Name(value)`. With speed 100 and 150, the smoke test verifies the preview starts as `B(66), A(100), B(132), A(200)`, then after B acts becomes `A(34), B(66), A(134)`.
+`BattleScreen` shows an `Action Order` panel on the left side of the battle field. It displays up to 10 upcoming entries as `Name(value)`. The preview simulates future action values and re-sorts after every simulated action. With speed 100 and 150, the smoke test verifies the preview starts as `B(66), A(100), B(132), B(198), A(200)`, then after B acts becomes `A(34), B(66), B(132), A(134)`.
 
 Battle flow:
 
@@ -325,7 +325,7 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 - Godot headless project load passed with `--headless --path . --quit`.
 - Godot editor headless load passed with `--headless --path . --editor --quit`.
 - Main scene short startup passed with `--headless --path . --quit-after 2`.
-- `tests/unit/battle_action_order_smoke_test.gd` passed and verifies speed 100/150 action order preview values before and after the first action.
+- `tests/unit/battle_action_order_smoke_test.gd` passed and verifies speed 100/150 action order preview values before and after the first action, including that `B(198)` sorts before `A(200)`.
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 

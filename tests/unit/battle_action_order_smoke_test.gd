@@ -41,13 +41,15 @@ func _init() -> void:
 	_assert_order(preview, 0, "B", 66)
 	_assert_order(preview, 1, "A", 100)
 	_assert_order(preview, 2, "B", 132)
-	_assert_order(preview, 3, "A", 200)
+	_assert_order(preview, 3, "B", 198)
+	_assert_order(preview, 4, "A", 200)
 
 	manager._advance_action_queue_after_current_actor()
 	preview = manager.action_order_preview()
 	_assert_order(preview, 0, "A", 34)
 	_assert_order(preview, 1, "B", 66)
-	_assert_order(preview, 2, "A", 134)
+	_assert_order(preview, 2, "B", 132)
+	_assert_order(preview, 3, "A", 134)
 	manager.free()
 	quit()
 

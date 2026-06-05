@@ -170,22 +170,19 @@ func action_order_preview() -> Array[Dictionary]:
 	simulated_queue.sort_custom(_is_action_entry_before)
 
 	var preview: Array[Dictionary] = []
-	while preview.size() < MAX_ACTION_ORDER_PREVIEW:
-		if simulated_queue.is_empty():
-			break
-		var queue_index := preview.size() % simulated_queue.size()
-		var cycle_index := int(float(preview.size()) / float(simulated_queue.size()))
-		var entry: Dictionary = simulated_queue[queue_index]
+	while preview.size() < MAX_ACTION_ORDER_PREVIEW and not simulated_queue.is_empty():
+		simulated_queue.sort_custom(_is_action_entry_before)
+		var entry: Dictionary = simulated_queue[0]
 		var combatant: Dictionary = _entry_combatant(entry)
 		if combatant.is_empty():
-			simulated_queue.remove_at(queue_index)
+			simulated_queue.remove_at(0)
 			continue
-		var action_value := int(entry["action_value"]) + int(entry["delay"]) * cycle_index
 		preview.append({
 			"name": combatant.get("name", "Actor"),
 			"side": entry["side"],
-			"action_value": action_value
+			"action_value": int(entry["action_value"])
 		})
+		entry["action_value"] = int(entry["action_value"]) + int(entry["delay"])
 	return preview
 
 
