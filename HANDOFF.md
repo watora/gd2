@@ -24,14 +24,20 @@ res://
     dungeon/dungeon_screen.tscn
   scripts/
     core/main_controller.gd
+    core/character_manager.gd
     management/management_screen.gd
     dungeon/dungeon_screen.gd
+    dungeon/dungeon_manager.gd
   data/
     config/buildings.json
     config/characters.json
     config/dungeon_events.json
     config/enemies.json
     config/items.json
+    config/skills.json
+  Assets/
+    bg/bg_dungeon_old_capital_map_placeholder.png
+    bg/bg_dungeon_crystal_cavern_map_placeholder.png
 ```
 
 Godot generated `.uid` files for the scripts. Keep them.
@@ -53,6 +59,7 @@ Godot generated `.uid` files for the scripts. Keep them.
 
 Runtime state lives in `scripts/core/main_controller.gd` in `game_state`.
 Initial static data is loaded from `data/config/*.json`.
+Character and skill data are loaded by `scripts/core/character_manager.gd`.
 
 Current state categories:
 
@@ -60,6 +67,7 @@ Current state categories:
 - `gold`
 - `dungeon_used_today`
 - `characters`
+- `skills`
 - `inventory`
 - `flags`
 - `journal`
@@ -87,8 +95,34 @@ Characters currently have:
 - `strength`
 - `agility`
 - `intelligence`
+- `skills`: an array of skill ids loaded from `data/config/characters.json`
 
 The management screen has a `Character Status` button that opens a character status panel.
+The character status panel displays each character's current skill names.
+
+`CharacterManager` loads and normalizes character data and skill data:
+
+```text
+res://scripts/core/character_manager.gd
+res://data/config/characters.json
+res://data/config/skills.json
+```
+
+Current configured character skills:
+
+- Aki Hoshino: `power_strike`, `quick_cut`
+- Mio Kirishima: `arcane_bolt`, `mana_spark`
+
+Skill definitions currently support:
+
+- `name`
+- `mp_cost`
+- `target`
+- `effect`
+- `base_damage`
+- `scaling_stat`
+- `power`
+- `description`
 
 Level-up behavior:
 
@@ -134,19 +168,42 @@ Script:
 
 ```text
 res://scripts/dungeon/dungeon_screen.gd
+res://scripts/dungeon/dungeon_manager.gd
 ```
 
 The dungeon map, event buttons, event panel, choice buttons, battle panel, battle commands, and item button are defined in the scene file.
-Dungeon event definitions are loaded from `res://data/config/dungeon_events.json`.
-Enemy definitions are loaded from `res://data/config/enemies.json`.
+`DungeonScreen` handles UI display, dynamic event buttons, map image presentation, and the current embedded battle overlay.
+`DungeonManager` handles dungeon config loading, enemy config loading, current map state, event resolution state, requirements checks, map travel, run rewards, run flags, and run summary.
+Click-open secondary panels now use explicit opaque `StyleBoxFlat` backgrounds in the scene files, including the management character panel, dungeon event panel, battle overlay, and battle item panel.
 
-Current event points:
+Dungeon maps are config-driven:
+
+- `start_map`: currently `old_capital`.
+- `maps`: defines each map title, background texture, and event button positions.
+- `events`: defines event text, choices, rewards, flags, requirements, battles, and map travel.
+
+Each dungeon map uses a single PNG top-down placeholder background through `background_texture`; the scene displays it with `MapImage` (`TextureRect`) instead of assembling the map from UI `ColorRect` blocks.
+
+Current maps:
+
+- `old_capital`: original Old Capital Dungeon map.
+- `crystal_cavern`: second dungeon map reached through the crystal gate.
+
+Current `old_capital` event points:
 
 - `sunken_well`
 - `collapsed_mine`
 - `sealed_gate`
 - `shadow_patrol`
 - `old_shrine`
+- `crystal_ward_gate`
+
+Current `crystal_cavern` event points:
+
+- `cavern_return_gate`
+- `crystal_garden`
+- `mana_spring`
+- `deep_crystal_nest`
 
 Event choices can define:
 
@@ -154,6 +211,7 @@ Event choices can define:
 - `flags`
 - `requirements`
 - `battle`
+- `travel`
 - `summary`
 - `result`
 
@@ -164,6 +222,17 @@ Stat-gated choices use `requirements`, for example:
 ```
 
 The current requirement check uses the best party member stat for each requested stat.
+
+Map travel is configured per event choice with:
+
+```json
+"travel": {"target_map": "crystal_cavern"}
+```
+
+The current repeatable travel events are:
+
+- `crystal_ward_gate`: travels from `old_capital` to `crystal_cavern`.
+- `cavern_return_gate`: travels from `crystal_cavern` to `old_capital`.
 
 ## Battle
 
@@ -176,9 +245,10 @@ Battle flow:
 3. Left side shows party members.
 4. Right side shows enemies.
 5. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
-6. Enemy turn runs after all living party members act.
-7. Victory adds battle rewards and EXP, then returns to dungeon map.
-8. Defeat ends the dungeon run and returns to base.
+6. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
+7. Enemy turn runs after all living party members act.
+8. Victory adds battle rewards and EXP, then returns to dungeon map.
+9. Defeat ends the dungeon run and returns to base.
 
 Current battle choices:
 
@@ -186,6 +256,12 @@ Current battle choices:
 - `Challenge the shrine guardian`
 
 During battle, the top `Return to Base` button is disabled to prevent leaving before combat resolves.
+
+Current skill damage formula:
+
+```text
+damage = base_damage + actor[scaling_stat] * power
+```
 
 ## Verified Flows
 
@@ -199,6 +275,17 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 - Runtime UI inspection confirmed dungeon event buttons are visible.
 - Clicking `Sunken Well` opened the event panel.
 - The event panel displayed config-driven choices, including a stat requirement label.
+- Clicking `Crystal Gate` opened a config-driven travel event.
+- Selecting `Enter the crystal cavern` switched the dungeon title to `Crystal Cavern` and replaced event buttons with the `crystal_cavern` map events.
+- Clicking `Return Gate` and selecting `Return to the old capital` switched the dungeon title back to `Old Capital Dungeon`.
+- Clicking `Sunken Well` after the map travel test still resolved a normal reward event and updated `Run rewards` to `Glowing Moss x2`.
+- Runtime property inspection confirmed `MapImage.texture` loads `res://Assets/bg/bg_dungeon_old_capital_map_placeholder.png` on the old capital map and switches to `res://Assets/bg/bg_dungeon_crystal_cavern_map_placeholder.png` after traveling to the crystal cavern.
+- Runtime scene-tree inspection confirmed `DungeonManager` is attached under `DungeonScreen` and uses `res://scripts/dungeon/dungeon_manager.gd`.
+- After the `DungeonManager` extraction, traveling to `crystal_cavern`, resolving `Crystal Garden`, and returning to base were re-verified; base inventory showed `Glowing Moss x3` and the journal showed `Dungeon: harvested luminous moss in the crystal garden.`.
+- Runtime scene-tree inspection confirmed `CharacterManager` is attached under `Main` and uses `res://scripts/core/character_manager.gd`.
+- Character status displayed Aki's `Power Strike, Quick Cut` skills and Mio's `Arcane Bolt, Mana Spark` skills.
+- In battle, clicking `Skill` for Aki displayed `Power Strike` and `Quick Cut`; selecting `Power Strike` spent 4 MP and dealt configured STR-scaling damage.
+- On Mio's turn, clicking `Skill` displayed `Arcane Bolt` and `Mana Spark`; selecting `Arcane Bolt` spent 5 MP and dealt configured INT-scaling damage.
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 

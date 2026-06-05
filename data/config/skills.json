@@ -1,0 +1,42 @@
+{
+  "power_strike": {
+    "name": "Power Strike",
+    "mp_cost": 4,
+    "target": "enemy",
+    "effect": "damage",
+    "base_damage": 6,
+    "scaling_stat": "strength",
+    "power": 2,
+    "description": "A heavy weapon strike that scales with STR."
+  },
+  "quick_cut": {
+    "name": "Quick Cut",
+    "mp_cost": 3,
+    "target": "enemy",
+    "effect": "damage",
+    "base_damage": 4,
+    "scaling_stat": "agility",
+    "power": 2,
+    "description": "A fast slash that scales with AGI."
+  },
+  "arcane_bolt": {
+    "name": "Arcane Bolt",
+    "mp_cost": 5,
+    "target": "enemy",
+    "effect": "damage",
+    "base_damage": 5,
+    "scaling_stat": "intelligence",
+    "power": 2,
+    "description": "A focused magic bolt that scales with INT."
+  },
+  "mana_spark": {
+    "name": "Mana Spark",
+    "mp_cost": 3,
+    "target": "enemy",
+    "effect": "damage",
+    "base_damage": 3,
+    "scaling_stat": "intelligence",
+    "power": 1,
+    "description": "A low-cost spell for finishing weakened enemies."
+  }
+}

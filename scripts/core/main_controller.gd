@@ -5,22 +5,24 @@ const MANAGEMENT_SCREEN_SCENE := preload("res://scenes/management/management_scr
 const DUNGEON_SCREEN_SCENE := preload("res://scenes/dungeon/dungeon_screen.tscn")
 
 const BUILDINGS_CONFIG := "res://data/config/buildings.json"
-const CHARACTERS_CONFIG := "res://data/config/characters.json"
 const ITEMS_CONFIG := "res://data/config/items.json"
 
 var game_state: Dictionary = {}
 var _current_screen: Control
+var _character_manager := CharacterManager.new()
 
 
 func _ready() -> void:
+	_character_manager.name = "CharacterManager"
+	add_child(_character_manager)
 	_initialize_game_state()
 	_show_management()
 
 
 func _initialize_game_state() -> void:
 	var item_config := _load_json(ITEMS_CONFIG)
-	var character_config := _load_json(CHARACTERS_CONFIG)
 	var building_config := _load_json(BUILDINGS_CONFIG)
+	_character_manager.load_data()
 
 	var inventory := {}
 	for item_id: String in item_config.keys():
@@ -31,7 +33,8 @@ func _initialize_game_state() -> void:
 		"day": 1,
 		"gold": 40,
 		"dungeon_used_today": false,
-		"characters": character_config.get("characters", []).duplicate(true),
+		"characters": _character_manager.initial_characters(),
+		"skills": _character_manager.skills(),
 		"inventory": inventory,
 		"flags": {},
 		"journal": ["Day 1: The frontier base is ready. One dungeon run is available."],

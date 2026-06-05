@@ -1,7 +1,31 @@
 {
+  "start_map": "old_capital",
+  "maps": {
+    "old_capital": {
+      "title": "Old Capital Dungeon",
+      "background_texture": "res://Assets/bg/bg_dungeon_old_capital_map_placeholder.png",
+      "event_points": [
+        {"event_id": "sunken_well", "text": "Sunken Well", "position": [250, 180], "size": [140, 42]},
+        {"event_id": "collapsed_mine", "text": "Collapsed Mine", "position": [560, 260], "size": [150, 42]},
+        {"event_id": "sealed_gate", "text": "Sealed Gate", "position": [770, 150], "size": [140, 42]},
+        {"event_id": "shadow_patrol", "text": "Shadow Patrol", "position": [420, 430], "size": [150, 42]},
+        {"event_id": "old_shrine", "text": "Old Shrine", "position": [820, 450], "size": [130, 42]},
+        {"event_id": "crystal_ward_gate", "text": "Crystal Gate", "position": [650, 520], "size": [140, 42]}
+      ]
+    },
+    "crystal_cavern": {
+      "title": "Crystal Cavern",
+      "background_texture": "res://Assets/bg/bg_dungeon_crystal_cavern_map_placeholder.png",
+      "event_points": [
+        {"event_id": "cavern_return_gate", "text": "Return Gate", "position": [170, 420], "size": [130, 42]},
+        {"event_id": "crystal_garden", "text": "Crystal Garden", "position": [430, 240], "size": [150, 42]},
+        {"event_id": "mana_spring", "text": "Mana Spring", "position": [700, 170], "size": [130, 42]},
+        {"event_id": "deep_crystal_nest", "text": "Crystal Nest", "position": [760, 430], "size": [140, 42]}
+      ]
+    }
+  },
   "events": {
     "sunken_well": {
-      "button_path": "MapLayer/SunkenWellButton",
       "title": "Sunken Well",
       "body": "A blue-green glow rises from the bottom of the old well.",
       "resolved_body": "The well has already been searched.",
@@ -28,7 +52,6 @@
       ]
     },
     "collapsed_mine": {
-      "button_path": "MapLayer/CollapsedMineButton",
       "title": "Collapsed Mine",
       "body": "Loose stone blocks the mine, but iron veins are visible through the cracks.",
       "resolved_body": "Only loose rubble remains in the mine.",
@@ -56,7 +79,6 @@
       ]
     },
     "sealed_gate": {
-      "button_path": "MapLayer/SealedGateButton",
       "title": "Sealed Gate",
       "body": "The gate bears the crest of the old capital. The seal is still active.",
       "resolved_body": "The gate runes have already been recorded.",
@@ -78,7 +100,6 @@
       ]
     },
     "shadow_patrol": {
-      "button_path": "MapLayer/ShadowPatrolButton",
       "title": "Shadow Patrol",
       "body": "Shadows patrol the ruined street. The party can avoid them or fight.",
       "resolved_body": "The patrol route has already been handled.",
@@ -113,7 +134,6 @@
       ]
     },
     "old_shrine": {
-      "button_path": "MapLayer/OldShrineButton",
       "title": "Old Shrine",
       "body": "The stone lantern beside the shrine is still warm.",
       "resolved_body": "The shrine has already answered the party.",
@@ -138,6 +158,103 @@
           "rewards": {"ancient_shard": 2, "machine_gear": 1, "healing_potion": 1},
           "summary": "Dungeon: defeated the shrine guardian and took the offering.",
           "result": "The guardian rises from the stone floor."
+        }
+      ]
+    },
+    "crystal_ward_gate": {
+      "title": "Crystal Ward Gate",
+      "body": "A warded gate hums beneath the old capital, pointing toward a second map.",
+      "resolved_body": "The crystal gate remains active.",
+      "repeatable": true,
+      "choices": [
+        {
+          "text": "Enter the crystal cavern",
+          "travel": {"target_map": "crystal_cavern"},
+          "summary": "Dungeon: passed through the crystal ward gate to the cavern.",
+          "result": "The ruins bend into a cold tunnel of blue crystal."
+        },
+        {
+          "text": "Stay in the old capital",
+          "result": "The party marks the gate and keeps exploring nearby."
+        }
+      ]
+    },
+    "cavern_return_gate": {
+      "title": "Return Gate",
+      "body": "The matching ward gate points back toward the old capital streets.",
+      "resolved_body": "The return gate remains active.",
+      "repeatable": true,
+      "choices": [
+        {
+          "text": "Return to the old capital",
+          "travel": {"target_map": "old_capital"},
+          "summary": "Dungeon: returned from the crystal cavern to the old capital.",
+          "result": "The crystal tunnel folds back into broken stone streets."
+        },
+        {
+          "text": "Stay in the cavern",
+          "result": "The party keeps searching the crystal cavern."
+        }
+      ]
+    },
+    "crystal_garden": {
+      "title": "Crystal Garden",
+      "body": "Pale plants grow between crystal roots, each leaf holding a drop of light.",
+      "resolved_body": "Only dim crystal roots remain in the garden.",
+      "choices": [
+        {
+          "text": "Harvest luminous moss",
+          "rewards": {"glowing_moss": 3},
+          "summary": "Dungeon: harvested luminous moss in the crystal garden.",
+          "result": "The moss keeps glowing after it is packed away."
+        },
+        {
+          "text": "Cut crystal samples",
+          "requirements": {"strength": 8},
+          "rewards": {"ancient_shard": 2, "glowing_moss": 1},
+          "summary": "Dungeon: cut crystal samples from the cavern garden.",
+          "result": "A hard crystal vein breaks into usable ancient shards."
+        }
+      ]
+    },
+    "mana_spring": {
+      "title": "Mana Spring",
+      "body": "A shallow spring reflects constellations that are not above the cavern.",
+      "resolved_body": "The spring has already offered its clearest fragments.",
+      "choices": [
+        {
+          "text": "Collect spring shards",
+          "rewards": {"ancient_shard": 2},
+          "summary": "Dungeon: collected ancient shards from the mana spring.",
+          "result": "The water clears, leaving two ancient shards in the basin."
+        },
+        {
+          "text": "Read the reflected stars",
+          "requirements": {"intelligence": 9},
+          "flags": {"cavern_star_map_read": true},
+          "rewards": {"ancient_shard": 3},
+          "summary": "Dungeon: read the reflected star map in the mana spring.",
+          "result": "The reflected stars reveal a route through the deeper cavern."
+        }
+      ]
+    },
+    "deep_crystal_nest": {
+      "title": "Deep Crystal Nest",
+      "body": "Cracked crystals gather around old armor marks. Something nested here recently.",
+      "resolved_body": "The crystal nest has already been cleared.",
+      "choices": [
+        {
+          "text": "Search abandoned gear",
+          "rewards": {"machine_gear": 1, "iron_ore": 1},
+          "summary": "Dungeon: recovered abandoned gear from the crystal nest.",
+          "result": "A rusted gear assembly is still usable after some cleaning."
+        },
+        {
+          "text": "Fight the lingering shadows",
+          "battle": {"enemies": ["shadow_wolf", "shadow_wolf"]},
+          "rewards": {"gold": 18, "ancient_shard": 1},
+          "summary": "Dungeon: defeated shadows in the crystal nest.",
+          "result": "Shadows gather around the cracked crystals."
         }
       ]
     }

@@ -153,7 +153,14 @@ func _character_stats_text(character: Dictionary) -> String:
 	var parts: Array[String] = []
 	for stat_id: String in STAT_NAMES:
 		parts.append("%s %d" % [STAT_NAMES[stat_id], int(character[stat_id])])
-	return " / ".join(parts)
+	return " / ".join(parts) + "\nSkills: " + _character_skills_text(character)
+
+
+func _character_skills_text(character: Dictionary) -> String:
+	var names: Array[String] = []
+	for skill_id: String in character.get("skills", []):
+		names.append(state.get("skills", {}).get(skill_id, {}).get("name", skill_id))
+	return "None" if names.is_empty() else ", ".join(names)
 
 
 func _calculate_income() -> int:

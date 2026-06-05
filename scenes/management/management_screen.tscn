@@ -1,6 +1,18 @@
-[gd_scene format=3 uid="uid://dc10g05brgidh"]
+[gd_scene load_steps=3 format=3 uid="uid://dc10g05brgidh"]
 
 [ext_resource type="Script" uid="uid://bpmqiumniglu0" path="res://scripts/management/management_screen.gd" id="1_management"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_character_popup"]
+bg_color = Color(0.12, 0.13, 0.16, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.38, 0.44, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
 
 [node name="ManagementScreen" type="Control" unique_id=1831288723]
 layout_mode = 3
@@ -318,6 +330,7 @@ offset_left = -230.0
 offset_top = -220.0
 offset_right = 230.0
 offset_bottom = 220.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_character_popup")
 
 [node name="CharacterMargin" type="MarginContainer" parent="CharacterPanel" unique_id=2141614600]
 layout_mode = 2

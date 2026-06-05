@@ -3,24 +3,7 @@ extends Control
 
 signal run_finished(rewards: Dictionary, flags: Dictionary, summary: Array[String])
 
-const EVENTS_CONFIG := "res://data/config/dungeon_events.json"
-const ENEMIES_CONFIG := "res://data/config/enemies.json"
-
-const STAT_NAMES := {
-	"hp": "HP",
-	"mp": "MP",
-	"strength": "STR",
-	"agility": "AGI",
-	"intelligence": "INT"
-}
-
 var state: Dictionary = {}
-var event_config: Dictionary = {}
-var enemy_config: Dictionary = {}
-var run_rewards: Dictionary = {"gold": 0}
-var run_flags: Dictionary = {}
-var run_summary: Array[String] = []
-var resolved_events: Dictionary = {}
 var current_choices: Array = []
 
 var battle_rewards: Dictionary = {}
@@ -31,6 +14,7 @@ var active_actor_index := 0
 var guarding: Dictionary = {}
 
 @onready var _map_layer: Control = %MapLayer
+@onready var _title_label: Label = %TitleLabel
 @onready var _reward_label: Label = %RewardLabel
 @onready var _finish_button: Button = %FinishButton
 @onready var _event_panel: PanelContainer = %EventPanel
@@ -47,31 +31,46 @@ var guarding: Dictionary = {}
 @onready var _skill_button: Button = %SkillButton
 @onready var _defend_button: Button = %DefendButton
 @onready var _item_button: Button = %ItemButton
-@onready var _item_panel: VBoxContainer = %ItemPanel
+@onready var _skill_panel: PanelContainer = %SkillPanel
+@onready var _skill_choice_button_0: Button = %SkillChoiceButton0
+@onready var _skill_choice_button_1: Button = %SkillChoiceButton1
+@onready var _skill_choice_button_2: Button = %SkillChoiceButton2
+@onready var _skill_choice_button_3: Button = %SkillChoiceButton3
+@onready var _skill_hint: Label = %SkillHint
+@onready var _item_panel: PanelContainer = %ItemPanel
 @onready var _potion_button: Button = %PotionButton
 @onready var _potion_hint: Label = %PotionHint
 
 var _choice_buttons: Array[Button] = []
+var _skill_choice_buttons: Array[Button] = []
 var _party_labels: Array[Label] = []
 var _enemy_labels: Array[Label] = []
+var _event_buttons: Dictionary = {}
+var _map_textures: Dictionary = {}
+var _map_image: TextureRect
+var _manager := DungeonManager.new()
 
 
 func setup(new_state: Dictionary) -> void:
 	state = new_state
-	_initialize_run_rewards()
+	_manager.start_run(state)
 	if is_inside_tree():
+		_apply_current_map()
 		_update_reward_label()
 
 
 func _ready() -> void:
-	event_config = _load_json(EVENTS_CONFIG).get("events", {})
-	enemy_config = _load_json(ENEMIES_CONFIG).get("enemies", {})
+	_manager.name = "DungeonManager"
+	add_child(_manager)
 	_cache_scene_nodes()
 	_event_panel.visible = false
 	_battle_layer.visible = false
+	_skill_panel.visible = false
 	_item_panel.visible = false
 	_set_battle_buttons_enabled(false)
-	_update_reward_label()
+	if not state.is_empty():
+		_apply_current_map()
+		_update_reward_label()
 
 
 func _cache_scene_nodes() -> void:
@@ -82,34 +81,15 @@ func _cache_scene_nodes() -> void:
 		_choice_button_3,
 		_choice_button_4
 	]
+	_skill_choice_buttons = [
+		_skill_choice_button_0,
+		_skill_choice_button_1,
+		_skill_choice_button_2,
+		_skill_choice_button_3
+	]
 	_party_labels = [%PartyLabel0, %PartyLabel1]
 	_enemy_labels = [%EnemyLabel0, %EnemyLabel1, %EnemyLabel2]
-
-
-func _initialize_run_rewards() -> void:
-	run_rewards = {"gold": 0}
-	for item_id: String in state.get("inventory", {}):
-		run_rewards[item_id] = 0
-
-
-func _on_sunken_well_button_pressed() -> void:
-	_open_event("sunken_well")
-
-
-func _on_collapsed_mine_button_pressed() -> void:
-	_open_event("collapsed_mine")
-
-
-func _on_sealed_gate_button_pressed() -> void:
-	_open_event("sealed_gate")
-
-
-func _on_shadow_patrol_button_pressed() -> void:
-	_open_event("shadow_patrol")
-
-
-func _on_old_shrine_button_pressed() -> void:
-	_open_event("old_shrine")
+	_map_image = %MapImage
 
 
 func _on_finish_button_pressed() -> void:
@@ -141,7 +121,7 @@ func _on_attack_button_pressed() -> void:
 
 
 func _on_skill_button_pressed() -> void:
-	_battle_skill()
+	_show_battle_skills()
 
 
 func _on_defend_button_pressed() -> void:
@@ -156,9 +136,61 @@ func _on_potion_button_pressed() -> void:
 	_use_healing_potion()
 
 
+func _on_skill_choice_button_0_pressed() -> void:
+	_use_skill_index(0)
+
+
+func _on_skill_choice_button_1_pressed() -> void:
+	_use_skill_index(1)
+
+
+func _on_skill_choice_button_2_pressed() -> void:
+	_use_skill_index(2)
+
+
+func _on_skill_choice_button_3_pressed() -> void:
+	_use_skill_index(3)
+
+
+func _apply_current_map() -> void:
+	var map_data := _manager.current_map()
+	if map_data.is_empty():
+		return
+
+	_title_label.text = map_data.get("title", "Dungeon Map")
+	_map_image.texture = _map_texture(map_data)
+	_rebuild_event_buttons(_manager.current_event_points())
+
+
+func _rebuild_event_buttons(event_points: Array) -> void:
+	for button: Button in _event_buttons.values():
+		button.queue_free()
+	_event_buttons.clear()
+
+	for point: Dictionary in event_points:
+		var event_id := String(point.get("event_id", ""))
+		if event_id == "" or not _manager.has_event(event_id):
+			continue
+		var event_data := _manager.event_data(event_id)
+		var button := Button.new()
+		button.name = "%s_button" % event_id
+		button.text = point.get("text", event_data.get("title", event_id))
+		button.position = _vector2_from_config(point.get("position", [0, 0]))
+		button.size = _vector2_from_config(point.get("size", [140, 42]))
+		button.pressed.connect(_on_event_button_pressed.bind(event_id))
+		_map_layer.add_child(button)
+		_event_buttons[event_id] = button
+
+
+func _on_event_button_pressed(event_id: String) -> void:
+	_open_event(event_id)
+
+
 func _open_event(event_id: String) -> void:
-	var event_data: Dictionary = event_config[event_id]
-	if resolved_events.has(event_id):
+	if not _manager.has_event(event_id):
+		return
+	var event_data := _manager.event_data(event_id)
+	if not _manager.is_event_repeatable(event_id) and _manager.is_event_resolved(event_id):
 		_event_title.text = "Already searched"
 		_event_body.text = event_data.get("resolved_body", "There are no new clues here.")
 		_set_choices([{"text": "Close", "method": "_close_event"}])
@@ -167,12 +199,7 @@ func _open_event(event_id: String) -> void:
 
 	_event_title.text = event_data["title"]
 	_event_body.text = event_data["body"]
-	var choices: Array = []
-	for choice: Dictionary in event_data.get("choices", []):
-		var prepared_choice := choice.duplicate(true)
-		prepared_choice["event_id"] = event_id
-		choices.append(prepared_choice)
-	_set_choices(choices)
+	_set_choices(_manager.choices_for_event(event_id))
 	_event_panel.visible = true
 
 
@@ -188,8 +215,8 @@ func _set_choices(choices: Array) -> void:
 		var choice: Dictionary = choices[index]
 		var requirements: Dictionary = choice.get("requirements", {})
 		button.visible = true
-		button.text = choice["text"] + _requirements_text(requirements)
-		button.disabled = not _meets_requirements(requirements)
+		button.text = choice["text"] + _manager.requirements_text(requirements)
+		button.disabled = not _manager.meets_requirements(requirements)
 
 
 func _resolve_choice_index(index: int) -> void:
@@ -203,63 +230,36 @@ func _resolve_choice(choice: Dictionary) -> void:
 		call(choice["method"])
 		return
 
-	var requirements: Dictionary = choice.get("requirements", {})
-	if not _meets_requirements(requirements):
-		_event_body.text = "The party does not meet this requirement."
+	var result := _manager.resolve_choice(choice)
+	if not bool(result.get("ok", false)):
+		_event_body.text = result.get("message", "The party cannot resolve this event.")
 		return
 
-	if choice.has("battle"):
-		resolved_events[choice["event_id"]] = true
-		_start_battle(choice)
+	if result.has("battle"):
+		_start_battle(result)
 		return
 
-	resolved_events[choice["event_id"]] = true
-	if choice.has("rewards"):
-		_add_run_rewards(choice["rewards"])
-	if choice.has("flags"):
-		for flag_name: String in choice["flags"]:
-			run_flags[flag_name] = choice["flags"][flag_name]
-	if choice.has("summary"):
-		run_summary.append(choice["summary"])
-	_event_title.text = "Investigation complete"
-	_event_body.text = choice.get("result", "The party records this change.")
+	if bool(result.get("traveled", false)):
+		_event_panel.visible = false
+		_apply_current_map()
+		_update_reward_label()
+		return
+
+	_event_title.text = result.get("title", "Investigation complete")
+	_event_body.text = result.get("body", "The party records this change.")
 	_set_choices([{"text": "Continue exploring", "method": "_close_event"}])
 	_update_reward_label()
 
 
-func _meets_requirements(requirements: Dictionary) -> bool:
-	if requirements.is_empty():
-		return true
-	for stat_id: String in requirements:
-		if _best_party_stat(stat_id) < int(requirements[stat_id]):
-			return false
-	return true
-
-
-func _best_party_stat(stat_id: String) -> int:
-	var best_value := 0
-	for character: Dictionary in state.get("characters", []):
-		best_value = max(best_value, int(character.get(stat_id, 0)))
-	return best_value
-
-
-func _requirements_text(requirements: Dictionary) -> String:
-	if requirements.is_empty():
-		return ""
-	var parts: Array[String] = []
-	for stat_id: String in requirements:
-		parts.append("%s %d" % [STAT_NAMES.get(stat_id, stat_id), int(requirements[stat_id])])
-	return "  [Need %s]" % " / ".join(parts)
-
-
-func _start_battle(choice: Dictionary) -> void:
+func _start_battle(battle_result: Dictionary) -> void:
 	_event_panel.visible = false
 	_map_layer.visible = false
 	_battle_layer.visible = true
 	_finish_button.disabled = true
+	_skill_panel.visible = false
 	_item_panel.visible = false
-	battle_rewards = choice.get("rewards", {})
-	battle_summary = choice.get("summary", "Dungeon: won a battle.")
+	battle_rewards = battle_result.get("battle_rewards", {})
+	battle_summary = battle_result.get("battle_summary", "Dungeon: won a battle.")
 	battle_party = []
 	battle_enemies = []
 	guarding = {}
@@ -269,12 +269,13 @@ func _start_battle(choice: Dictionary) -> void:
 		_prepare_character_growth_fields(character)
 		battle_party.append(character)
 
-	var enemy_ids: Array = choice.get("battle", {}).get("enemies", [])
+	var enemy_ids: Array = battle_result.get("battle", {}).get("enemies", [])
 	for enemy_id: String in enemy_ids:
-		if enemy_config.has(enemy_id):
-			battle_enemies.append(enemy_config[enemy_id].duplicate(true))
+		var enemy := _manager.enemy_data(enemy_id)
+		if not enemy.is_empty():
+			battle_enemies.append(enemy)
 
-	_battle_log.text = choice.get("result", "Enemies block the path.")
+	_battle_log.text = battle_result.get("body", "Enemies block the path.")
 	_refresh_battle()
 
 
@@ -312,7 +313,7 @@ func _refresh_battle() -> void:
 	var actor: Dictionary = _active_actor()
 	var actor_ready := _is_character_alive(actor)
 	_attack_button.disabled = not actor_ready
-	_skill_button.disabled = not (actor_ready and int(actor["mp"]) >= 5)
+	_skill_button.disabled = not (actor_ready and not _character_skill_ids(actor).is_empty())
 	_defend_button.disabled = not actor_ready
 	_item_button.disabled = not actor_ready
 
@@ -325,6 +326,7 @@ func _set_battle_buttons_enabled(enabled: bool) -> void:
 
 
 func _battle_attack() -> void:
+	_hide_command_subpanels()
 	var actor: Dictionary = _active_actor()
 	var target: Dictionary = _first_alive_enemy()
 	if target.is_empty():
@@ -335,26 +337,72 @@ func _battle_attack() -> void:
 	_after_player_action()
 
 
-func _battle_skill() -> void:
-	var actor: Dictionary = _active_actor()
-	var target: Dictionary = _first_alive_enemy()
-	if target.is_empty():
-		return
-	actor["mp"] = max(0, int(actor["mp"]) - 5)
-	var damage: int = max(2, int(actor["intelligence"]) * 2)
-	target["hp"] -= damage
-	_battle_log.text = "%s casts a skill on %s for %d damage." % [actor["name"], target["name"], damage]
-	_after_player_action()
-
-
 func _battle_defend() -> void:
+	_hide_command_subpanels()
 	var actor: Dictionary = _active_actor()
 	guarding[actor["name"]] = true
 	_battle_log.text = "%s defends." % actor["name"]
 	_after_player_action()
 
 
+func _show_battle_skills() -> void:
+	var actor: Dictionary = _active_actor()
+	var skill_ids := _character_skill_ids(actor)
+	_item_panel.visible = false
+	for index: int in range(_skill_choice_buttons.size()):
+		var button := _skill_choice_buttons[index]
+		if index >= skill_ids.size():
+			button.visible = false
+			button.disabled = true
+			button.text = ""
+			continue
+		var skill_id := String(skill_ids[index])
+		var skill := _skill_data(skill_id)
+		var mp_cost := int(skill.get("mp_cost", 0))
+		button.visible = true
+		button.text = "%s  MP %d" % [skill.get("name", skill_id), mp_cost]
+		button.disabled = int(actor.get("mp", 0)) < mp_cost
+	_skill_hint.text = "Choose a skill for %s." % actor.get("name", "the active character")
+	_skill_panel.visible = true
+
+
+func _use_skill_index(index: int) -> void:
+	var actor: Dictionary = _active_actor()
+	var skill_ids := _character_skill_ids(actor)
+	if index < 0 or index >= skill_ids.size():
+		return
+	_use_skill(String(skill_ids[index]))
+
+
+func _use_skill(skill_id: String) -> void:
+	var actor: Dictionary = _active_actor()
+	var target: Dictionary = _first_alive_enemy()
+	if target.is_empty():
+		return
+	var skill := _skill_data(skill_id)
+	if skill.is_empty():
+		_battle_log.text = "Skill data is missing: %s." % skill_id
+		return
+	var mp_cost := int(skill.get("mp_cost", 0))
+	if int(actor.get("mp", 0)) < mp_cost:
+		_battle_log.text = "%s does not have enough MP." % actor.get("name", "Actor")
+		return
+
+	actor["mp"] = max(0, int(actor["mp"]) - mp_cost)
+	var damage := _skill_damage(actor, skill)
+	target["hp"] -= damage
+	_battle_log.text = "%s uses %s on %s for %d damage." % [
+		actor["name"],
+		skill.get("name", skill_id),
+		target["name"],
+		damage
+	]
+	_hide_command_subpanels()
+	_after_player_action()
+
+
 func _show_battle_items() -> void:
+	_skill_panel.visible = false
 	var potion_count := int(state["inventory"].get("healing_potion", 0))
 	var heal_hp := int(state.get("items", {}).get("healing_potion", {}).get("heal_hp", 20))
 	_potion_button.text = "Use Healing Potion x%d" % potion_count
@@ -373,7 +421,7 @@ func _use_healing_potion() -> void:
 	state["inventory"]["healing_potion"] = potion_count - 1
 	actor["hp"] = min(int(actor["max_hp"]), int(actor["hp"]) + heal_hp)
 	_battle_log.text = "%s uses a healing potion and recovers to %d HP." % [actor["name"], actor["hp"]]
-	_item_panel.visible = false
+	_hide_command_subpanels()
 	_after_player_action()
 
 
@@ -386,7 +434,7 @@ func _after_player_action() -> void:
 		if _check_battle_result():
 			return
 		active_actor_index = _next_living_party_index(0)
-	_item_panel.visible = false
+	_hide_command_subpanels()
 	_refresh_battle()
 
 
@@ -411,14 +459,14 @@ func _enemy_turn() -> void:
 
 func _check_battle_result() -> bool:
 	if _all_enemies_defeated():
-		_add_run_rewards(battle_rewards)
-		run_summary.append(battle_summary)
+		_manager.add_run_rewards(battle_rewards)
+		_manager.append_summary(battle_summary)
 		_award_battle_exp()
 		_battle_log.text += "\nVictory."
 		_end_battle()
 		return true
 	if _all_party_defeated():
-		run_summary.append("Dungeon: the party was defeated and forced back to base.")
+		_manager.append_summary("Dungeon: the party was defeated and forced back to base.")
 		_battle_log.text += "\nDefeat. Exploration ends."
 		_finish_run()
 		return true
@@ -429,6 +477,7 @@ func _end_battle() -> void:
 	_battle_layer.visible = false
 	_map_layer.visible = true
 	_finish_button.disabled = false
+	_hide_command_subpanels()
 	_update_reward_label()
 
 
@@ -447,6 +496,27 @@ func _first_alive_enemy() -> Dictionary:
 		if int(enemy["hp"]) > 0:
 			return enemy
 	return {}
+
+
+func _character_skill_ids(character: Dictionary) -> Array:
+	return character.get("skills", [])
+
+
+func _skill_data(skill_id: String) -> Dictionary:
+	return state.get("skills", {}).get(skill_id, {})
+
+
+func _skill_damage(actor: Dictionary, skill: Dictionary) -> int:
+	var stat_id := String(skill.get("scaling_stat", "intelligence"))
+	var stat_value := int(actor.get(stat_id, 0))
+	var base_damage := int(skill.get("base_damage", 0))
+	var power := int(skill.get("power", 1))
+	return max(1, base_damage + stat_value * power)
+
+
+func _hide_command_subpanels() -> void:
+	_skill_panel.visible = false
+	_item_panel.visible = false
 
 
 func _is_character_alive(character: Dictionary) -> bool:
@@ -491,7 +561,7 @@ func _award_battle_exp() -> void:
 			continue
 		_prepare_character_growth_fields(character)
 		character["exp"] = int(character["exp"]) + exp_reward
-		run_summary.append("%s gains %d EXP." % [character["name"], exp_reward])
+		_manager.append_summary("%s gains %d EXP." % [character["name"], exp_reward])
 		while int(character["exp"]) >= int(character["next_exp"]):
 			_level_up_character(character)
 
@@ -527,30 +597,23 @@ func _level_up_character(character: Dictionary) -> void:
 	character["intelligence"] = int(character["intelligence"]) + 1
 	character["hp"] = int(character["max_hp"])
 	character["mp"] = int(character["max_mp"])
-	run_summary.append("%s reaches Lv.%d and grows stronger." % [character["name"], character["level"]])
-
-
-func _add_run_rewards(rewards: Dictionary) -> void:
-	for reward_id: String in rewards:
-		run_rewards[reward_id] = int(run_rewards.get(reward_id, 0)) + int(rewards[reward_id])
+	_manager.append_summary("%s reaches Lv.%d and grows stronger." % [character["name"], character["level"]])
 
 
 func _update_reward_label() -> void:
 	if _reward_label == null:
 		return
 	var parts: Array[String] = []
-	if int(run_rewards.get("gold", 0)) > 0:
-		parts.append("Gold x%d" % run_rewards["gold"])
+	if int(_manager.run_rewards.get("gold", 0)) > 0:
+		parts.append("Gold x%d" % _manager.run_rewards["gold"])
 	for item_id: String in state.get("inventory", {}):
-		if int(run_rewards.get(item_id, 0)) > 0:
-			parts.append("%s x%d" % [_item_name(item_id), run_rewards.get(item_id, 0)])
+		if int(_manager.run_rewards.get(item_id, 0)) > 0:
+			parts.append("%s x%d" % [_item_name(item_id), _manager.run_rewards.get(item_id, 0)])
 	_reward_label.text = "Run rewards: " + ("None" if parts.is_empty() else ", ".join(parts))
 
 
 func _finish_run() -> void:
-	if run_summary.is_empty():
-		run_summary.append("Dungeon: the party withdrew carefully without new findings.")
-	run_finished.emit(run_rewards, run_flags, run_summary)
+	run_finished.emit(_manager.run_rewards, _manager.run_flags, _manager.finish_summary())
 
 
 func _close_event() -> void:
@@ -561,10 +624,21 @@ func _item_name(item_id: String) -> String:
 	return state.get("items", {}).get(item_id, {}).get("name", item_id)
 
 
-func _load_json(path: String) -> Dictionary:
-	var text := FileAccess.get_file_as_string(path)
-	var parsed = JSON.parse_string(text)
-	if parsed is Dictionary:
-		return parsed
-	push_error("Failed to load JSON config: %s" % path)
-	return {}
+func _vector2_from_config(value: Variant) -> Vector2:
+	if value is Array and value.size() >= 2:
+		return Vector2(float(value[0]), float(value[1]))
+	return Vector2.ZERO
+
+
+func _map_texture(map_data: Dictionary) -> Texture2D:
+	var texture_path := String(map_data.get("background_texture", ""))
+	if texture_path == "":
+		return null
+	if _map_textures.has(texture_path):
+		return _map_textures[texture_path]
+	var texture := load(texture_path)
+	if texture is Texture2D:
+		_map_textures[texture_path] = texture
+		return texture
+	push_error("Failed to load dungeon map texture: %s" % texture_path)
+	return null

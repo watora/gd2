@@ -1,6 +1,30 @@
-[gd_scene load_steps=2 format=3 uid="uid://dungeon_demo_screen"]
+[gd_scene load_steps=4 format=3 uid="uid://dungeon_demo_screen"]
 
 [ext_resource type="Script" path="res://scripts/dungeon/dungeon_screen.gd" id="1_dungeon"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup_panel"]
+bg_color = Color(0.105, 0.115, 0.145, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.38, 0.44, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_item_popup"]
+bg_color = Color(0.135, 0.145, 0.175, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.44, 0.5, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [node name="DungeonScreen" type="Control"]
 layout_mode = 3
@@ -29,134 +53,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="MapBase" type="ColorRect" parent="MapLayer"]
+[node name="MapImage" type="TextureRect" parent="MapLayer"]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.12, 0.13, 0.16, 1)
-
-[node name="PathA" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 120.0
-offset_top = 240.0
-offset_right = 940.0
-offset_bottom = 284.0
-color = Color(0.3, 0.27, 0.22, 1)
-
-[node name="PathB" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 260.0
-offset_top = 140.0
-offset_right = 304.0
-offset_bottom = 460.0
-color = Color(0.3, 0.27, 0.22, 1)
-
-[node name="PathC" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 520.0
-offset_top = 220.0
-offset_right = 564.0
-offset_bottom = 470.0
-color = Color(0.3, 0.27, 0.22, 1)
-
-[node name="PathD" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 720.0
-offset_top = 120.0
-offset_right = 764.0
-offset_bottom = 470.0
-color = Color(0.3, 0.27, 0.22, 1)
-
-[node name="PathE" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 200.0
-offset_top = 430.0
-offset_right = 820.0
-offset_bottom = 468.0
-color = Color(0.3, 0.27, 0.22, 1)
-
-[node name="RuinA" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 90.0
-offset_top = 95.0
-offset_right = 160.0
-offset_bottom = 145.0
-color = Color(0.19, 0.2, 0.23, 1)
-
-[node name="RuinB" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 205.0
-offset_top = 213.0
-offset_right = 275.0
-offset_bottom = 263.0
-color = Color(0.19, 0.2, 0.23, 1)
-
-[node name="RuinC" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 320.0
-offset_top = 331.0
-offset_right = 390.0
-offset_bottom = 381.0
-color = Color(0.19, 0.2, 0.23, 1)
-
-[node name="RuinD" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 550.0
-offset_top = 105.0
-offset_right = 620.0
-offset_bottom = 155.0
-color = Color(0.19, 0.2, 0.23, 1)
-
-[node name="RuinE" type="ColorRect" parent="MapLayer"]
-layout_mode = 0
-offset_left = 780.0
-offset_top = 330.0
-offset_right = 850.0
-offset_bottom = 380.0
-color = Color(0.19, 0.2, 0.23, 1)
-
-[node name="SunkenWellButton" type="Button" parent="MapLayer"]
-layout_mode = 0
-offset_left = 250.0
-offset_top = 180.0
-offset_right = 390.0
-offset_bottom = 222.0
-text = "Sunken Well"
-
-[node name="CollapsedMineButton" type="Button" parent="MapLayer"]
-layout_mode = 0
-offset_left = 560.0
-offset_top = 260.0
-offset_right = 710.0
-offset_bottom = 302.0
-text = "Collapsed Mine"
-
-[node name="SealedGateButton" type="Button" parent="MapLayer"]
-layout_mode = 0
-offset_left = 770.0
-offset_top = 150.0
-offset_right = 910.0
-offset_bottom = 192.0
-text = "Sealed Gate"
-
-[node name="ShadowPatrolButton" type="Button" parent="MapLayer"]
-layout_mode = 0
-offset_left = 420.0
-offset_top = 430.0
-offset_right = 570.0
-offset_bottom = 472.0
-text = "Shadow Patrol"
-
-[node name="OldShrineButton" type="Button" parent="MapLayer"]
-layout_mode = 0
-offset_left = 820.0
-offset_top = 450.0
-offset_right = 950.0
-offset_bottom = 492.0
-text = "Old Shrine"
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
 
 [node name="TopMargin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -173,6 +80,7 @@ layout_mode = 2
 theme_override_constants/separation = 12
 
 [node name="TitleLabel" type="Label" parent="TopMargin/TopBar"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 28
@@ -201,6 +109,7 @@ offset_left = -460.0
 offset_top = 84.0
 offset_right = -24.0
 offset_bottom = -84.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
 
 [node name="EventMargin" type="MarginContainer" parent="EventPanel"]
 layout_mode = 2
@@ -261,6 +170,7 @@ offset_right = -24.0
 offset_bottom = -24.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
 
 [node name="BattleMargin" type="MarginContainer" parent="BattleLayer"]
 layout_mode = 2
@@ -421,26 +331,75 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Item"
 
-[node name="ItemPanel" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
+[node name="SkillPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_item_popup")
+
+[node name="SkillMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="SkillRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin"]
+layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PotionButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel"]
+[node name="SkillChoiceButton0" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SkillChoiceButton1" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SkillChoiceButton2" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SkillChoiceButton3" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="SkillHint" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Choose a skill."
+autowrap_mode = 2
+
+[node name="ItemPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_item_popup")
+
+[node name="ItemMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="ItemRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/ItemMargin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PotionButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/ItemMargin/ItemRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="PotionHint" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel"]
+[node name="PotionHint" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/ItemMargin/ItemRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Healing Potion: restore 20 HP to the active character."
 
-[connection signal="pressed" from="MapLayer/SunkenWellButton" to="." method="_on_sunken_well_button_pressed"]
-[connection signal="pressed" from="MapLayer/CollapsedMineButton" to="." method="_on_collapsed_mine_button_pressed"]
-[connection signal="pressed" from="MapLayer/SealedGateButton" to="." method="_on_sealed_gate_button_pressed"]
-[connection signal="pressed" from="MapLayer/ShadowPatrolButton" to="." method="_on_shadow_patrol_button_pressed"]
-[connection signal="pressed" from="MapLayer/OldShrineButton" to="." method="_on_old_shrine_button_pressed"]
 [connection signal="pressed" from="TopMargin/TopBar/FinishButton" to="." method="_on_finish_button_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton0" to="." method="_on_choice_button_0_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton1" to="." method="_on_choice_button_1_pressed"]
@@ -451,4 +410,8 @@ text = "Healing Potion: restore 20 HP to the active character."
 [connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/SkillButton" to="." method="_on_skill_button_pressed"]
 [connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/DefendButton" to="." method="_on_defend_button_pressed"]
 [connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/ItemButton" to="." method="_on_item_button_pressed"]
-[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/PotionButton" to="." method="_on_potion_button_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton0" to="." method="_on_skill_choice_button_0_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton1" to="." method="_on_skill_choice_button_1_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton2" to="." method="_on_skill_choice_button_2_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton3" to="." method="_on_skill_choice_button_3_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/ItemMargin/ItemRoot/PotionButton" to="." method="_on_potion_button_pressed"]

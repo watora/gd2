@@ -13,7 +13,8 @@
       "max_mp": 16,
       "strength": 7,
       "agility": 8,
-      "intelligence": 6
+      "intelligence": 6,
+      "skills": ["power_strike", "quick_cut"]
     },
     {
       "id": "mio",
@@ -28,7 +29,8 @@
       "max_mp": 30,
       "strength": 4,
       "agility": 6,
-      "intelligence": 9
+      "intelligence": 9,
+      "skills": ["arcane_bolt", "mana_spark"]
     }
   ]
 }
