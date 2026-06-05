@@ -1,0 +1,31 @@
+{
+  "enemies": {
+    "shadow_wolf": {
+      "name": "影狼",
+      "hp": 18,
+      "max_hp": 18,
+      "strength": 5,
+      "agility": 7,
+      "intelligence": 2,
+      "exp": 12
+    },
+    "wandering_armor": {
+      "name": "徘徊铠甲",
+      "hp": 24,
+      "max_hp": 24,
+      "strength": 6,
+      "agility": 3,
+      "intelligence": 1,
+      "exp": 14
+    },
+    "shrine_guardian": {
+      "name": "石灯守卫",
+      "hp": 42,
+      "max_hp": 42,
+      "strength": 7,
+      "agility": 4,
+      "intelligence": 5,
+      "exp": 24
+    }
+  }
+}

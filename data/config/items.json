@@ -1,0 +1,7 @@
+{
+  "ancient_shard": {"name": "Ancient Shard"},
+  "iron_ore": {"name": "Iron Ore"},
+  "glowing_moss": {"name": "Glowing Moss"},
+  "machine_gear": {"name": "Machine Gear"},
+  "healing_potion": {"name": "Healing Potion", "heal_hp": 20}
+}

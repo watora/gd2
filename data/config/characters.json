@@ -1,0 +1,34 @@
+{
+  "characters": [
+    {
+      "id": "aki",
+      "name": "Aki Hoshino",
+      "role": "Trainee Explorer",
+      "level": 1,
+      "exp": 0,
+      "next_exp": 20,
+      "hp": 38,
+      "max_hp": 38,
+      "mp": 16,
+      "max_mp": 16,
+      "strength": 7,
+      "agility": 8,
+      "intelligence": 6
+    },
+    {
+      "id": "mio",
+      "name": "Mio Kirishima",
+      "role": "Ruins Mage",
+      "level": 1,
+      "exp": 0,
+      "next_exp": 20,
+      "hp": 28,
+      "max_hp": 28,
+      "mp": 30,
+      "max_mp": 30,
+      "strength": 4,
+      "agility": 6,
+      "intelligence": 9
+    }
+  ]
+}

@@ -10,3 +10,445 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_dungeon")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.045, 0.055, 0.07, 1)
+
+[node name="MapLayer" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MapBase" type="ColorRect" parent="MapLayer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.13, 0.16, 1)
+
+[node name="PathA" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 240.0
+offset_right = 940.0
+offset_bottom = 284.0
+color = Color(0.3, 0.27, 0.22, 1)
+
+[node name="PathB" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 140.0
+offset_right = 304.0
+offset_bottom = 460.0
+color = Color(0.3, 0.27, 0.22, 1)
+
+[node name="PathC" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 520.0
+offset_top = 220.0
+offset_right = 564.0
+offset_bottom = 470.0
+color = Color(0.3, 0.27, 0.22, 1)
+
+[node name="PathD" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 720.0
+offset_top = 120.0
+offset_right = 764.0
+offset_bottom = 470.0
+color = Color(0.3, 0.27, 0.22, 1)
+
+[node name="PathE" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 430.0
+offset_right = 820.0
+offset_bottom = 468.0
+color = Color(0.3, 0.27, 0.22, 1)
+
+[node name="RuinA" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 90.0
+offset_top = 95.0
+offset_right = 160.0
+offset_bottom = 145.0
+color = Color(0.19, 0.2, 0.23, 1)
+
+[node name="RuinB" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 205.0
+offset_top = 213.0
+offset_right = 275.0
+offset_bottom = 263.0
+color = Color(0.19, 0.2, 0.23, 1)
+
+[node name="RuinC" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 320.0
+offset_top = 331.0
+offset_right = 390.0
+offset_bottom = 381.0
+color = Color(0.19, 0.2, 0.23, 1)
+
+[node name="RuinD" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 105.0
+offset_right = 620.0
+offset_bottom = 155.0
+color = Color(0.19, 0.2, 0.23, 1)
+
+[node name="RuinE" type="ColorRect" parent="MapLayer"]
+layout_mode = 0
+offset_left = 780.0
+offset_top = 330.0
+offset_right = 850.0
+offset_bottom = 380.0
+color = Color(0.19, 0.2, 0.23, 1)
+
+[node name="SunkenWellButton" type="Button" parent="MapLayer"]
+layout_mode = 0
+offset_left = 250.0
+offset_top = 180.0
+offset_right = 390.0
+offset_bottom = 222.0
+text = "Sunken Well"
+
+[node name="CollapsedMineButton" type="Button" parent="MapLayer"]
+layout_mode = 0
+offset_left = 560.0
+offset_top = 260.0
+offset_right = 710.0
+offset_bottom = 302.0
+text = "Collapsed Mine"
+
+[node name="SealedGateButton" type="Button" parent="MapLayer"]
+layout_mode = 0
+offset_left = 770.0
+offset_top = 150.0
+offset_right = 910.0
+offset_bottom = 192.0
+text = "Sealed Gate"
+
+[node name="ShadowPatrolButton" type="Button" parent="MapLayer"]
+layout_mode = 0
+offset_left = 420.0
+offset_top = 430.0
+offset_right = 570.0
+offset_bottom = 472.0
+text = "Shadow Patrol"
+
+[node name="OldShrineButton" type="Button" parent="MapLayer"]
+layout_mode = 0
+offset_left = 820.0
+offset_top = 450.0
+offset_right = 950.0
+offset_bottom = 492.0
+text = "Old Shrine"
+
+[node name="TopMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 22
+
+[node name="TopBar" type="HBoxContainer" parent="TopMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="TopMargin/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+text = "Old Capital Dungeon"
+
+[node name="RewardLabel" type="Label" parent="TopMargin/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+
+[node name="FinishButton" type="Button" parent="TopMargin/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Return to Base"
+
+[node name="EventPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -460.0
+offset_top = 84.0
+offset_right = -24.0
+offset_bottom = -84.0
+
+[node name="EventMargin" type="MarginContainer" parent="EventPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="EventRoot" type="VBoxContainer" parent="EventPanel/EventMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EventTitle" type="Label" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+
+[node name="EventBody" type="Label" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 2
+
+[node name="ChoiceButton0" type="Button" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ChoiceButton1" type="Button" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ChoiceButton2" type="Button" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ChoiceButton3" type="Button" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ChoiceButton4" type="Button" parent="EventPanel/EventMargin/EventRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="BattleLayer" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 72.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BattleMargin" type="MarginContainer" parent="BattleLayer"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="BattleRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BattleTitle" type="Label" parent="BattleLayer/BattleMargin/BattleRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "Battle Encounter"
+horizontal_alignment = 1
+
+[node name="BattleField" type="HBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="PartyPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PartyMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/PartyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="PartyRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PartyTitle" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Party"
+
+[node name="PartyLabel0" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PartyLabel1" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="EnemyMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="EnemyRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EnemyTitle" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Enemies"
+
+[node name="EnemyLabel0" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyLabel1" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EnemyLabel2" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BattleLower" type="HBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LogPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LogMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/LogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="LogRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/LogPanel/LogMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LogTitle" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/LogPanel/LogMargin/LogRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Battle Log"
+
+[node name="BattleLog" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/LogPanel/LogMargin/LogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(360, 84)
+size_flags_horizontal = 3
+autowrap_mode = 2
+
+[node name="CommandPanel" type="PanelContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower"]
+layout_mode = 2
+custom_minimum_size = Vector2(420, 0)
+
+[node name="CommandMargin" type="MarginContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="CommandRoot" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CommandTitle" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Commands"
+
+[node name="BattleActions" type="HBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AttackButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Attack"
+
+[node name="SkillButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Skill"
+
+[node name="DefendButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Defend"
+
+[node name="ItemButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Item"
+
+[node name="ItemPanel" type="VBoxContainer" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PotionButton" type="Button" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PotionHint" type="Label" parent="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Healing Potion: restore 20 HP to the active character."
+
+[connection signal="pressed" from="MapLayer/SunkenWellButton" to="." method="_on_sunken_well_button_pressed"]
+[connection signal="pressed" from="MapLayer/CollapsedMineButton" to="." method="_on_collapsed_mine_button_pressed"]
+[connection signal="pressed" from="MapLayer/SealedGateButton" to="." method="_on_sealed_gate_button_pressed"]
+[connection signal="pressed" from="MapLayer/ShadowPatrolButton" to="." method="_on_shadow_patrol_button_pressed"]
+[connection signal="pressed" from="MapLayer/OldShrineButton" to="." method="_on_old_shrine_button_pressed"]
+[connection signal="pressed" from="TopMargin/TopBar/FinishButton" to="." method="_on_finish_button_pressed"]
+[connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton0" to="." method="_on_choice_button_0_pressed"]
+[connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton1" to="." method="_on_choice_button_1_pressed"]
+[connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton2" to="." method="_on_choice_button_2_pressed"]
+[connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton3" to="." method="_on_choice_button_3_pressed"]
+[connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton4" to="." method="_on_choice_button_4_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/AttackButton" to="." method="_on_attack_button_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/SkillButton" to="." method="_on_skill_button_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/DefendButton" to="." method="_on_defend_button_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/ItemButton" to="." method="_on_item_button_pressed"]
+[connection signal="pressed" from="BattleLayer/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/PotionButton" to="." method="_on_potion_button_pressed"]

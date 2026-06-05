@@ -1,92 +1,48 @@
 class_name MainController
 extends Control
 
-const ManagementScreenScene := preload("res://scenes/management/management_screen.tscn")
-const DungeonScreenScene := preload("res://scenes/dungeon/dungeon_screen.tscn")
+const MANAGEMENT_SCREEN_SCENE := preload("res://scenes/management/management_screen.tscn")
+const DUNGEON_SCREEN_SCENE := preload("res://scenes/dungeon/dungeon_screen.tscn")
 
-var game_state: Dictionary = {
-	"day": 1,
-	"gold": 40,
-	"dungeon_used_today": false,
-	"characters": [
-		{
-			"name": "星野明",
-			"role": "见习探索者",
-			"hp": 38,
-			"mp": 16,
-			"strength": 7,
-			"agility": 8,
-			"intelligence": 6
-		},
-		{
-			"name": "雾岛澪",
-			"role": "遗迹术士",
-			"hp": 28,
-			"mp": 30,
-			"strength": 4,
-			"agility": 6,
-			"intelligence": 9
-		}
-	],
-	"inventory": {
-		"ancient_shard": 0,
-		"iron_ore": 0,
-		"glowing_moss": 0,
-		"machine_gear": 0
-	},
-	"flags": {},
-	"journal": ["第 1 天：据点刚刚建立，今天可以探索一次地下城。"],
-	"buildings": {
-		"guild_hall": {
-			"name": "冒险者公会",
-			"description": "组织探索队伍，提供稳定金币收入。",
-			"built": true,
-			"level": 1,
-			"max_level": 3,
-			"income_gold": 12,
-			"build_cost": {},
-			"upgrade_costs": {
-				1: {"iron_ore": 2},
-				2: {"iron_ore": 3, "ancient_shard": 1}
-			}
-		},
-		"workshop": {
-			"name": "修复工坊",
-			"description": "修复地下城带回的器物，增加每日金币收入。",
-			"built": false,
-			"level": 0,
-			"max_level": 2,
-			"income_gold": 18,
-			"build_cost": {"machine_gear": 1, "iron_ore": 1},
-			"upgrade_costs": {
-				1: {"machine_gear": 1, "ancient_shard": 1}
-			}
-		},
-		"herb_garden": {
-			"name": "药草温室",
-			"description": "培育发光苔藓，每日将药草加工为金币。",
-			"built": false,
-			"level": 0,
-			"max_level": 2,
-			"income_gold": 15,
-			"build_cost": {"glowing_moss": 2},
-			"upgrade_costs": {
-				1: {"glowing_moss": 3, "iron_ore": 1}
-			}
-		}
-	}
-}
+const BUILDINGS_CONFIG := "res://data/config/buildings.json"
+const CHARACTERS_CONFIG := "res://data/config/characters.json"
+const ITEMS_CONFIG := "res://data/config/items.json"
 
+var game_state: Dictionary = {}
 var _current_screen: Control
 
 
 func _ready() -> void:
+	_initialize_game_state()
 	_show_management()
+
+
+func _initialize_game_state() -> void:
+	var item_config := _load_json(ITEMS_CONFIG)
+	var character_config := _load_json(CHARACTERS_CONFIG)
+	var building_config := _load_json(BUILDINGS_CONFIG)
+
+	var inventory := {}
+	for item_id: String in item_config.keys():
+		inventory[item_id] = 0
+	inventory["healing_potion"] = 2
+
+	game_state = {
+		"day": 1,
+		"gold": 40,
+		"dungeon_used_today": false,
+		"characters": character_config.get("characters", []).duplicate(true),
+		"inventory": inventory,
+		"flags": {},
+		"journal": ["Day 1: The frontier base is ready. One dungeon run is available."],
+		"buildings": building_config.get("buildings", {}).duplicate(true),
+		"items": item_config.duplicate(true)
+	}
 
 
 func _show_management() -> void:
 	_clear_screen()
-	var screen: Control = ManagementScreenScene.instantiate()
+	var screen: Control = MANAGEMENT_SCREEN_SCENE.instantiate()
 	_current_screen = screen
 	add_child(screen)
 	screen.setup(game_state)
@@ -97,12 +53,12 @@ func _show_management() -> void:
 
 func _show_dungeon() -> void:
 	if game_state["dungeon_used_today"]:
-		_add_journal("今天已经探索过地下城了。")
+		_add_journal("The dungeon has already been explored today.")
 		_show_management()
 		return
 
 	_clear_screen()
-	var screen: Control = DungeonScreenScene.instantiate()
+	var screen: Control = DUNGEON_SCREEN_SCENE.instantiate()
 	_current_screen = screen
 	add_child(screen)
 	screen.setup(game_state)
@@ -124,48 +80,52 @@ func _advance_day() -> void:
 	game_state["gold"] += income
 	game_state["day"] += 1
 	game_state["dungeon_used_today"] = false
-	_add_journal("第 %d 天结算：据点建筑产出 %d 金币。" % [game_state["day"] - 1, income])
-	_add_journal("第 %d 天开始：地下城探索次数已刷新。" % game_state["day"])
+	_add_journal("Day %d settlement: base buildings produced %d gold." % [game_state["day"] - 1, income])
+	_add_journal("Day %d begins: dungeon entry has refreshed." % game_state["day"])
 	_show_management()
 
 
 func _handle_building_action(building_id: String) -> void:
 	var building: Dictionary = game_state["buildings"][building_id]
-	var cost: Dictionary = {}
-	var action_name := ""
+	var cost := _building_action_cost(building)
+	var action_name := "Build" if not bool(building["built"]) else "Upgrade"
 
-	if not building["built"]:
-		cost = building["build_cost"]
-		action_name = "建造"
-	else:
-		if int(building["level"]) >= int(building["max_level"]):
-			_add_journal("%s 已达到最高等级。" % building["name"])
-			_show_management()
-			return
-		cost = building["upgrade_costs"][building["level"]]
-		action_name = "升级"
+	if _is_building_done(building):
+		_add_journal("%s is already at max level." % building["name"])
+		_show_management()
+		return
 
 	if not _has_items(cost):
-		_add_journal("%s%s失败：地下城材料不足。" % [action_name, building["name"]])
+		_add_journal("%s %s failed: dungeon materials are not enough." % [action_name, building["name"]])
 		_show_management()
 		return
 
 	_pay_items(cost)
-	if not building["built"]:
+	if not bool(building["built"]):
 		building["built"] = true
 		building["level"] = 1
 	else:
-		building["level"] += 1
+		building["level"] = int(building["level"]) + 1
 
-	_add_journal("%s%s完成，当前等级 Lv.%d。" % [action_name, building["name"], building["level"]])
+	_add_journal("%s %s complete. Current level: Lv.%d." % [action_name, building["name"], building["level"]])
 	_show_management()
+
+
+func _building_action_cost(building: Dictionary) -> Dictionary:
+	if not bool(building["built"]):
+		return building.get("build_cost", {})
+	return building.get("upgrade_costs", {}).get(str(building["level"]), {})
+
+
+func _is_building_done(building: Dictionary) -> bool:
+	return bool(building["built"]) and int(building["level"]) >= int(building["max_level"])
 
 
 func _calculate_daily_income() -> int:
 	var total := 0
 	for building_id: String in game_state["buildings"]:
 		var building: Dictionary = game_state["buildings"][building_id]
-		if building["built"]:
+		if bool(building["built"]):
 			total += int(building["income_gold"]) * int(building["level"])
 	return total
 
@@ -173,9 +133,12 @@ func _calculate_daily_income() -> int:
 func _add_rewards(rewards: Dictionary) -> void:
 	if rewards.has("gold"):
 		game_state["gold"] += int(rewards["gold"])
-	for item_id: String in game_state["inventory"]:
-		if rewards.has(item_id):
-			game_state["inventory"][item_id] += int(rewards[item_id])
+	for reward_id: String in rewards:
+		if reward_id == "gold":
+			continue
+		if not game_state["inventory"].has(reward_id):
+			game_state["inventory"][reward_id] = 0
+		game_state["inventory"][reward_id] += int(rewards[reward_id])
 
 
 func _has_items(cost: Dictionary) -> bool:
@@ -202,3 +165,12 @@ func _clear_screen() -> void:
 		_current_screen = null
 		remove_child(old_screen)
 		old_screen.queue_free()
+
+
+func _load_json(path: String) -> Dictionary:
+	var text := FileAccess.get_file_as_string(path)
+	var parsed = JSON.parse_string(text)
+	if parsed is Dictionary:
+		return parsed
+	push_error("Failed to load JSON config: %s" % path)
+	return {}

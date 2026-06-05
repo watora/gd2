@@ -137,6 +137,7 @@ func _update_room_label() -> void:
 - UI 场景根节点优先使用合适的 `Control` 派生类。
 - 2D 游戏对象优先使用 `Node2D`、`CharacterBody2D`、`Area2D`、`Sprite2D`、`AnimatedSprite2D`。
 - UI 布局优先使用容器节点，不手写绝对位置堆 UI。
+- 静态 UI 骨架、主要按钮、面板、地图事件点和战斗指令应直接放在 `.tscn` 场景中；脚本只负责绑定逻辑、读取配置、刷新文本和控制显隐。
 - 关键节点使用唯一名称 `%NodeName`，但不要滥用唯一名称。
 - 场景之间通过明确的 API、信号或全局状态服务通信，避免跨场景随意查找节点。
 
@@ -174,6 +175,7 @@ dungeon_forest_ruins_room_pool.tres
 ## Resource 与数据约定
 
 - 角色、敌人、道具、设施、地下城房间等可配置内容优先建为 `.tres` Resource。
+- 当前 demo 阶段允许使用 `data/config/*.json` 存放建筑、角色、道具、敌人、地下城事件等配置；后续系统稳定后再迁移为 typed Resource。
 - 需要表格化批量调整的数据可以放入 `data/balance/`，但运行时应有清晰的加载入口。
 - 不把平衡数值散落在 UI 脚本中。
 - 数据 Resource 中只存配置，不直接持有运行时状态。
@@ -210,3 +212,11 @@ dungeon_forest_ruins_room_pool.tres
 - 不要把临时调试节点、测试按钮、硬编码奖励留在正式场景中，除非明确标注为 demo-only。
 - 不要在一个脚本里混合经营、地下城、战斗和 UI 展示逻辑。
 - 任何新增系统都应先满足第一阶段 demo 的可玩闭环，再考虑扩展性。
+
+## HANDOFF.md 使用说明
+
+- `HANDOFF.md` 是当前 demo 状态的交接文档。每次完成一个可运行的玩法增量后，都应同步更新该文件。
+- 更新内容应包括：新增或修改的主要文件、玩法入口、状态数据、验证过的流程、已知技术债和建议下一步。
+- 如果修改了主场景、核心状态结构、角色/建筑/道具/敌人字段、地下城事件格式或战斗流程，必须更新 `HANDOFF.md`。
+- `HANDOFF.md` 只记录当前真实实现，不写未完成的设计愿望；未完成内容放到“Known Technical Debt”或“Suggested Next Steps”。
+- 后续开发者开始工作前，应先阅读 `agents.md` 和 `HANDOFF.md`，再检查相关脚本和场景。

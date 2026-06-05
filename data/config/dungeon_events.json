@@ -1,0 +1,145 @@
+{
+  "events": {
+    "sunken_well": {
+      "button_path": "MapLayer/SunkenWellButton",
+      "title": "Sunken Well",
+      "body": "A blue-green glow rises from the bottom of the old well.",
+      "resolved_body": "The well has already been searched.",
+      "choices": [
+        {
+          "text": "Gather glowing moss",
+          "rewards": {"glowing_moss": 2},
+          "summary": "Dungeon: gathered glowing moss from the sunken well.",
+          "result": "The moss comes loose in soft blue strands."
+        },
+        {
+          "text": "Climb down the slick wall",
+          "requirements": {"agility": 8},
+          "rewards": {"glowing_moss": 1, "ancient_shard": 1},
+          "summary": "Dungeon: passed an agility check and reached a hidden ledge.",
+          "result": "The party reaches a hidden ledge and finds an ancient shard."
+        },
+        {
+          "text": "Raise the metal lockbox",
+          "rewards": {"machine_gear": 1},
+          "summary": "Dungeon: found a machine gear in the old well.",
+          "result": "The lockbox contains a preserved machine gear."
+        }
+      ]
+    },
+    "collapsed_mine": {
+      "button_path": "MapLayer/CollapsedMineButton",
+      "title": "Collapsed Mine",
+      "body": "Loose stone blocks the mine, but iron veins are visible through the cracks.",
+      "resolved_body": "Only loose rubble remains in the mine.",
+      "choices": [
+        {
+          "text": "Mine exposed ore",
+          "rewards": {"iron_ore": 3},
+          "summary": "Dungeon: mined iron ore from the collapsed tunnel.",
+          "result": "The pack grows heavy with iron ore."
+        },
+        {
+          "text": "Move the fallen boulder",
+          "requirements": {"strength": 8},
+          "rewards": {"iron_ore": 4, "machine_gear": 1},
+          "summary": "Dungeon: passed a strength check and cleared the deeper tunnel.",
+          "result": "Beyond the boulder are more ore and a machine gear."
+        },
+        {
+          "text": "Pull the old support lever",
+          "flags": {"east_gate_open": true},
+          "rewards": {"iron_ore": 1},
+          "summary": "Dungeon: activated a mine lever; a distant gate moved.",
+          "result": "A stone gate rumbles somewhere far away."
+        }
+      ]
+    },
+    "sealed_gate": {
+      "button_path": "MapLayer/SealedGateButton",
+      "title": "Sealed Gate",
+      "body": "The gate bears the crest of the old capital. The seal is still active.",
+      "resolved_body": "The gate runes have already been recorded.",
+      "choices": [
+        {
+          "text": "Record the runes",
+          "rewards": {"ancient_shard": 1},
+          "summary": "Dungeon: recorded the sealed gate runes and recovered a shard.",
+          "result": "A loose shard breaks away from the old inscription."
+        },
+        {
+          "text": "Analyze the sealing formula",
+          "requirements": {"intelligence": 9},
+          "flags": {"east_gate_open": true},
+          "rewards": {"ancient_shard": 2},
+          "summary": "Dungeon: passed an intelligence check and weakened the seal.",
+          "result": "The seal loosens and high-grade ancient shards fall free."
+        }
+      ]
+    },
+    "shadow_patrol": {
+      "button_path": "MapLayer/ShadowPatrolButton",
+      "title": "Shadow Patrol",
+      "body": "Shadows patrol the ruined street. The party can avoid them or fight.",
+      "resolved_body": "The patrol route has already been handled.",
+      "choices": [
+        {
+          "text": "Avoid the patrol and search supplies",
+          "rewards": {"gold": 15, "glowing_moss": 1},
+          "summary": "Dungeon: avoided the shadow patrol and found supplies.",
+          "result": "The party avoids combat and finds an old coin pouch."
+        },
+        {
+          "text": "Slip through the patrol gap",
+          "requirements": {"agility": 9},
+          "rewards": {"gold": 25, "machine_gear": 1},
+          "summary": "Dungeon: passed an agility check and found hidden supplies.",
+          "result": "The party slips through the patrol line at the perfect moment."
+        },
+        {
+          "text": "Mark enemy positions",
+          "flags": {"battle_marker_found": true},
+          "rewards": {"gold": 8},
+          "summary": "Dungeon: marked a future combat point.",
+          "result": "The patrol route is marked on the map."
+        },
+        {
+          "text": "Fight the shadow patrol",
+          "battle": {"enemies": ["shadow_wolf", "wandering_armor"]},
+          "rewards": {"gold": 24, "iron_ore": 1},
+          "summary": "Dungeon: defeated the shadow patrol and recovered supplies.",
+          "result": "The patrol blocks the road and combat begins."
+        }
+      ]
+    },
+    "old_shrine": {
+      "button_path": "MapLayer/OldShrineButton",
+      "title": "Old Shrine",
+      "body": "The stone lantern beside the shrine is still warm.",
+      "resolved_body": "The shrine has already answered the party.",
+      "choices": [
+        {
+          "text": "Inspect the lantern base",
+          "rewards": {"ancient_shard": 1, "machine_gear": 1},
+          "summary": "Dungeon: found an ancient shard and a machine gear at the shrine.",
+          "result": "A hidden compartment opens beneath the lantern."
+        },
+        {
+          "text": "Light the shrine with magic",
+          "requirements": {"mp": 25, "intelligence": 8},
+          "rewards": {"ancient_shard": 3},
+          "summary": "Dungeon: used magic to reveal the shrine offering.",
+          "result": "Blue-white flame reveals three ancient shards."
+        },
+        {
+          "text": "Challenge the shrine guardian",
+          "requirements": {"intelligence": 8},
+          "battle": {"enemies": ["shrine_guardian"]},
+          "rewards": {"ancient_shard": 2, "machine_gear": 1, "healing_potion": 1},
+          "summary": "Dungeon: defeated the shrine guardian and took the offering.",
+          "result": "The guardian rises from the stone floor."
+        }
+      ]
+    }
+  }
+}
