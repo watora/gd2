@@ -1,0 +1,116 @@
+[gd_scene load_steps=4 format=3 uid="uid://b1aveh0hevel0"]
+
+[ext_resource type="Script" path="res://scripts/ui/event_dialog.gd" id="1_dialog"]
+[ext_resource type="Texture2D" path="res://Assets/characters/char_silhouette_portrait_placeholder.png" id="2_portrait"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialog_panel"]
+bg_color = Color(0.08, 0.09, 0.12, 0.96)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.42, 0.45, 0.56, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="EventDialog" type="Control"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_dialog")
+default_portrait = ExtResource("2_portrait")
+
+[node name="DialogAnchor" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.03
+anchor_top = 0.55
+anchor_right = 0.97
+anchor_bottom = 0.98
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="DialogRow" type="HBoxContainer" parent="DialogAnchor"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="LeftPortrait" type="TextureRect" parent="DialogAnchor/DialogRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 220)
+layout_mode = 2
+size_flags_vertical = 8
+texture = ExtResource("2_portrait")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DialogPanel" type="PanelContainer" parent="DialogAnchor/DialogRow"]
+custom_minimum_size = Vector2(420, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+theme_override_styles/panel = SubResource("StyleBoxFlat_dialog_panel")
+
+[node name="DialogMargin" type="MarginContainer" parent="DialogAnchor/DialogRow/DialogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 14
+
+[node name="DialogRoot" type="VBoxContainer" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EventTitleLabel" type="Label" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.74, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 16
+
+[node name="SpeakerNameLabel" type="Label" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
+[node name="DialogueLabel" type="Label" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 18
+text = "Dialogue text"
+autowrap_mode = 2
+
+[node name="DialogActions" type="HBoxContainer" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot"]
+layout_mode = 2
+alignment = 2
+
+[node name="EventCloseButton" type="Button" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot/DialogActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Skip"
+
+[node name="EventNextButton" type="Button" parent="DialogAnchor/DialogRow/DialogPanel/DialogMargin/DialogRoot/DialogActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Next"
+
+[node name="RightPortrait" type="TextureRect" parent="DialogAnchor/DialogRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 220)
+layout_mode = 2
+size_flags_vertical = 8
+texture = ExtResource("2_portrait")
+expand_mode = 1
+stretch_mode = 5

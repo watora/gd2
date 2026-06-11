@@ -20,10 +20,14 @@ var run_flags: Dictionary = {}
 var run_summary: Array[String] = []
 var resolved_events: Dictionary = {}
 var current_map_id := ""
+var _config_path := EVENTS_CONFIG
+var _requested_start_map_id := ""
 
 
-func start_run(new_state: Dictionary) -> void:
+func start_run(new_state: Dictionary, config_path := EVENTS_CONFIG, start_map_id := "") -> void:
 	state = new_state
+	_config_path = config_path
+	_requested_start_map_id = start_map_id
 	_load_configs()
 	_initialize_run_rewards()
 	_select_start_map()
@@ -85,6 +89,9 @@ func resolve_choice(choice: Dictionary) -> Dictionary:
 	if choice.has("flags"):
 		for flag_name: String in choice["flags"]:
 			run_flags[flag_name] = choice["flags"][flag_name]
+	if choice.has("trigger_event"):
+		var event_id := String(choice["trigger_event"])
+		run_flags["trigger_event:%s" % event_id] = true
 	if choice.has("summary"):
 		append_summary(choice["summary"])
 	if choice.has("travel"):
@@ -143,7 +150,7 @@ func finish_summary() -> Array[String]:
 
 
 func _load_configs() -> void:
-	dungeon_config = _load_json(EVENTS_CONFIG)
+	dungeon_config = _load_json(_config_path)
 	map_config = dungeon_config.get("maps", {})
 	event_config = dungeon_config.get("events", {})
 
@@ -158,6 +165,9 @@ func _initialize_run_rewards() -> void:
 
 
 func _select_start_map() -> void:
+	if _requested_start_map_id != "" and map_config.has(_requested_start_map_id):
+		current_map_id = _requested_start_map_id
+		return
 	current_map_id = String(dungeon_config.get("start_map", ""))
 	if current_map_id != "" and map_config.has(current_map_id):
 		return

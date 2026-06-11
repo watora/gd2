@@ -1,6 +1,6 @@
 # GD2 Demo Handoff
 
-Last updated: 2026-06-05
+Last updated: 2026-06-10
 
 ## Current State
 
@@ -13,6 +13,7 @@ res://scenes/main/main.tscn
 
 Static UI skeletons are implemented directly in scene files. Scripts update scene nodes and handle behavior.
 As of 2026-06-05, the main gameplay scripts and rebuilt scene text use ASCII display strings to avoid corrupted string literals that previously prevented the project from running.
+As of 2026-06-09, the project uses a 1152x648 base viewport with `canvas_items` stretch and `expand` aspect. Main UI overlays use anchors and containers so they can stay visible when the window changes size.
 
 ## Implemented Files
 
@@ -21,16 +22,21 @@ res://
   scenes/
     main/main.tscn
     management/management_screen.tscn
+    world/world_screen.tscn
     dungeon/dungeon_screen.tscn
     battle/battle_screen.tscn
+    ui/event_dialog.tscn
   scripts/
     core/main_controller.gd
+    core/game_event_manager.gd
     core/character_manager.gd
     management/management_screen.gd
+    world/world_screen.gd
     dungeon/dungeon_screen.gd
     dungeon/dungeon_manager.gd
     battle/battle_screen.gd
     battle/battle_manager.gd
+    ui/event_dialog.gd
   data/
     config/buildings.json
     config/characters.json
@@ -38,27 +44,41 @@ res://
     config/enemies.json
     config/items.json
     config/skills.json
+    config/timeline_events.json
+    config/world_map.json
+    config/world_location_events.json
   tests/
     unit/battle_action_order_smoke_test.gd
   Assets/
     bg/bg_dungeon_old_capital_map_placeholder.png
     bg/bg_dungeon_crystal_cavern_map_placeholder.png
+    bg/bg_world_map_placeholder.png
+    bg/bg_frontier_city_placeholder.png
+    bg/bg_moonlit_forest_placeholder.png
+    bg/bg_red_waste_placeholder.png
+    characters/char_silhouette_portrait_placeholder.png
+    characters/char_chibi_adventurer_placeholder.png
+    enemies/enemy_shadow_chibi_placeholder.png
 ```
 
 Godot generated `.uid` files for the scripts. Keep them.
+Lowercase target directories remain preferred for future new resource roots, but this placeholder is under the existing `Assets/` directory on Windows.
 
 ## Gameplay Loop
 
 1. Start in the management base.
 2. View day, gold, expected daily income, inventory, buildings, and character status.
-3. Enter the dungeon once per day.
-4. Click dungeon map event points and choose event outcomes.
-5. Some event choices grant items or gold directly.
-6. Some event choices require party stats.
-7. Some event choices start turn-based combat.
-8. Dungeon rewards return to the base.
-9. Dungeon materials can build or upgrade buildings.
-10. Ending the day adds building income and refreshes dungeon entry.
+3. Click `Travel` to enter the world map.
+4. Select a world location, including city, forest, wasteland, or the old capital dungeon.
+5. Click location map event points and choose event outcomes.
+6. Some event choices grant items or gold directly.
+7. Some event choices require party stats.
+8. Some event choices start turn-based combat.
+9. Some event choices trigger story dialogue events loaded from external text config.
+10. Location rewards return to the base.
+11. Dungeon materials can build or upgrade buildings.
+12. Ending the day adds building income and refreshes dungeon entry.
+13. Fixed-date timeline events can appear as bottom dialogue popups on the main scene.
 
 ## State Model
 
@@ -75,11 +95,101 @@ Current state categories:
 - `skills`
 - `inventory`
 - `flags`
+- `triggered_timeline_events`
 - `journal`
 - `buildings`
 - `items`
 
 The current config files and scene labels use ASCII display text. Later iterations can move display strings into localization files.
+
+## Timeline Events
+
+Fixed-date story/demo events are loaded from:
+
+```text
+res://data/config/timeline_events.json
+```
+
+Runtime logic lives in:
+
+```text
+res://scripts/core/game_event_manager.gd
+res://scripts/ui/event_dialog.gd
+res://scenes/ui/event_dialog.tscn
+```
+
+`MainController` checks due events after initial setup and after `End Day` advances the date. Events whose `day` matches the current `game_state["day"]` are queued if their id is not already in `game_state["triggered_timeline_events"]`.
+
+Current sample timeline events:
+
+- Day 1: `day_1_opening`
+- Day 3: `day_3_supply_report`
+- Day 5: `day_5_crystal_rumor`
+- Triggered by city notice board: `city_notice_request`
+- Triggered by forest herb study: `forest_spirit_trace`
+- Triggered by wasteland courier tag: `waste_courier_tag`
+
+The dialogue box appears at the bottom of the main scene. It displays the event title, current speaker name in the upper-left area of the dialogue panel, dialogue text, and left/right portrait images. Current sample events use:
+
+```text
+res://Assets/characters/char_silhouette_portrait_placeholder.png
+```
+
+Location event choices can set `trigger_event` to queue a story dialogue event by id after returning to the base. `DungeonManager` stores this as a `trigger_event:<event_id>` flag, and `MainController` resolves it through `GameEventManager.event_by_id()`.
+
+## World Map
+
+World map scene:
+
+```text
+res://scenes/world/world_screen.tscn
+```
+
+Script and config:
+
+```text
+res://scripts/world/world_screen.gd
+res://data/config/world_map.json
+res://data/config/world_location_events.json
+```
+
+The management screen's main outing button is now `Travel`. It opens the world map instead of directly entering the dungeon.
+
+`world_map.json` defines:
+
+- `background_texture`: `res://Assets/bg/bg_world_map_placeholder.png`
+- `locations`: world-map buttons with id, name, description, config path, start map, and normalized-at-runtime button positions.
+
+Current world locations:
+
+- `frontier_city`: uses `world_location_events.json`, start map `frontier_city`, background `res://Assets/bg/bg_frontier_city_placeholder.png`
+- `moonlit_forest`: uses `world_location_events.json`, start map `moonlit_forest`, background `res://Assets/bg/bg_moonlit_forest_placeholder.png`
+- `red_waste`: uses `world_location_events.json`, start map `red_waste`, background `res://Assets/bg/bg_red_waste_placeholder.png`
+- `old_capital_dungeon`: uses `dungeon_events.json`, start map `old_capital`, marked `is_dungeon`
+
+`WorldScreen` creates destination buttons at runtime with anchors normalized against the 1152x648 world layout size. Selecting a destination updates the info panel; clicking `Enter Location` sends the chosen config and start map to `MainController`.
+
+World locations reuse `DungeonScreen` and `DungeonManager` for now. `DungeonManager.start_run()` now accepts an optional config path and start map id, so city/forest/wasteland maps can use the same event resolution, rewards, requirements, battles, and map button logic as the dungeon.
+
+## Location Shops
+
+`DungeonScreen` also owns a reusable shop panel for world-location events that define a `shop` block.
+Clicking `Frontier City` -> `Market` opens this shop panel directly instead of the normal event choice panel.
+
+The shop panel shows purchasable goods on the left and item details plus a buy button on the right. Purchases immediately subtract `game_state["gold"]`, add the configured item quantity to `game_state["inventory"]`, refresh the shop gold label, and append a return-summary journal line.
+
+Current market goods are configured in:
+
+```text
+res://data/config/world_location_events.json
+```
+
+Current `city_market` goods:
+
+- `healing_potion` x1 for 12 gold
+- `iron_ore` x2 for 10 gold
+- `glowing_moss` x2 for 14 gold
+- `machine_gear` x1 for 24 gold
 
 ## Characters
 
@@ -182,6 +292,7 @@ The dungeon map, event buttons, event panel, and choice buttons are defined in t
 `DungeonScreen` handles UI display, dynamic event buttons, map image presentation, starting battle encounters, and applying battle results.
 `DungeonManager` handles dungeon config loading, current map state, event resolution state, requirements checks, map travel, run rewards, run flags, and run summary.
 Click-open secondary panels now use explicit opaque `StyleBoxFlat` backgrounds in the scene files, including the management character panel, dungeon event panel, battle screen, and battle item panel.
+Dungeon map event buttons are created at runtime with anchors normalized against the 1152x648 map layout size, instead of fixed pixel positions. This keeps event points aligned with the stretched map image.
 
 Dungeon maps are config-driven:
 
@@ -268,18 +379,38 @@ action_value = int(10000 / speed)
 
 `BattleScreen` shows an `Action Order` panel on the left side of the battle field. It displays up to 10 upcoming entries as `Name(value)`. The preview simulates future action values and re-sorts after every simulated action. With speed 100 and 150, the smoke test verifies the preview starts as `B(66), A(100), B(132), B(198), A(200)`, then after B acts becomes `A(34), B(66), B(132), A(134)`.
 
+Current battle layout:
+
+- Left side: action order panel.
+- Center/main stage: party slots are stacked vertically on the left and enemy slots are stacked vertically on the right.
+- Each combatant slot is a compact fixed-size row with the chibi placeholder, HP bar, name/status text, and damage number.
+- Party and enemy field slots are capped at 4 visible combatants per side.
+- Each party/enemy slot uses a fixed 320x82 display size so combatant display size does not change between 1 and 4 visible combatants.
+- Bottom area: battle log and action command buttons.
+- After attacks, `BattleManager` returns damage events and `BattleScreen` displays `-N` damage text above the damaged combatant.
+
+Current battle placeholder images:
+
+```text
+res://Assets/characters/char_chibi_adventurer_placeholder.png
+res://Assets/enemies/enemy_shadow_chibi_placeholder.png
+```
+
 Battle flow:
 
 1. Dungeon event choice includes a `battle` dictionary.
 2. Selecting the choice hides the event panel and instantiates `BattleScreen`.
 3. Left side shows action order.
-4. Middle shows party members.
-5. Right side shows enemies.
+4. Middle-left shows up to 4 active party members.
+5. Middle-right shows up to 4 active enemies.
 6. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
-7. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
-8. Enemy actions auto-resolve whenever an enemy is the next actor in the speed queue.
-9. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
-10. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
+7. `Attack` enters target selection. Clicking a living enemy slot highlights/selects that enemy and attacks that exact target.
+8. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
+9. Enemy actions auto-resolve whenever an enemy is the next actor in the speed queue.
+10. If a battle config contains more than 4 enemies, only the first 4 enter the field and the rest are stored in `enemy_reserves`.
+11. When an active enemy is defeated, its EXP is recorded and the next reserve enemy enters the same slot. Victory is not checked until active enemies and reserves are all defeated.
+12. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
+13. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
 
 Current battle choices:
 
@@ -327,6 +458,39 @@ The following flows were verified through Godot MCP CLI on 2026-06-05:
 - Main scene short startup passed with `--headless --path . --quit-after 2`.
 - `tests/unit/battle_action_order_smoke_test.gd` passed and verifies speed 100/150 action order preview values before and after the first action, including that `B(198)` sorts before `A(200)`.
 
+Additional verification on 2026-06-09:
+
+- Godot editor headless import passed with `--headless --path . --editor --quit` after adding the placeholder portrait.
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- MCP runtime inspection confirmed `/root/Main/EventDialog.visible` is `true` on Day 1.
+- MCP screen assertions confirmed `First Morning Briefing`, the first Aki line, and the second Mio line appear in the bottom dialogue popup.
+- MCP runtime property inspection confirmed the right portrait uses `res://Assets/characters/char_silhouette_portrait_placeholder.png`.
+- Closing the dialogue popup returns to the management screen with `Enter Dungeon` visible.
+- After closing the Day 1 event and clicking `End Day` twice, MCP screen assertions confirmed the Day 3 `Supply Report` event appears with its configured text.
+- `tests/unit/battle_action_order_smoke_test.gd` still passes after the event system changes.
+- Project window settings were set through the Godot project setting API to viewport 1152x648, stretch mode `canvas_items`, and stretch aspect `expand`.
+- MCP runtime rectangle checks confirmed the management body, `Enter Dungeon` button, and Day 1 dialogue panel remain inside the visible viewport under the stretch setup.
+- MCP runtime property inspection confirmed dungeon event buttons now have normalized anchors with zero offsets, and the dungeon event panel uses relative anchors with zero offsets.
+- MCP runtime assertions confirmed `Travel` opens `WorldScreen`, the generated world map texture loads from `res://Assets/bg/bg_world_map_placeholder.png`, and world locations including `Frontier City` and `Old Capital Dungeon` are visible.
+- MCP runtime flow verified selecting `Frontier City`, entering the location, opening `Notice Board`, choosing `Read the sealed notice`, returning to base, and showing the triggered `Notice Board Request` dialogue.
+- MCP runtime flow verified selecting `Old Capital Dungeon` from the world map enters the existing old capital dungeon map and shows the `Sunken Well` event point.
+- MCP runtime property inspection confirmed `Frontier City`, `Moonlit Forest`, and `Red Waste` each load their generated placeholder background textures.
+- MCP runtime battle verification confirmed the updated battle layout has the left action-order panel, bottom command buttons, party/enemy chibi placeholder textures, HP bars, and persistent damage labels after an attack.
+
+Additional verification on 2026-06-10:
+
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed after the battle field limit changes.
+- `git diff --check` passed.
+- MCP runtime battle setup with 5 `shadow_wolf` enemies confirmed 4 active enemies, 1 reserve enemy, and 2 visible party members.
+- MCP runtime slot inspection confirmed 1-enemy and 4-enemy battle displays both keep active party/enemy slot sizes at `(110.0, 147.0)`.
+- MCP runtime combat inspection confirmed defeating enemy slot 0 records 12 EXP, removes one reserve, and inserts the replacement enemy into slot 0 with full HP while keeping 4 active enemies.
+- Main scene short startup, `tests/unit/battle_action_order_smoke_test.gd`, and `git diff --check` passed after adding the Frontier City market shop panel.
+- MCP runtime flow verified opening `Frontier City` -> `Market` shows the shop panel, the first left-side item button reads `Healing Potion x1 - 12 gold`, and buying it changes gold `40 -> 28` and healing potions `2 -> 3`.
+- Main scene short startup, `tests/unit/battle_action_order_smoke_test.gd`, and `git diff --check` passed after changing the battle field to vertical side columns and targeted attacks.
+- MCP runtime slot inspection confirmed 4 party slots and 4 enemy slots stack vertically at y positions `147/235/323/411` with fixed `(320.0, 82.0)` slot size.
+- MCP runtime combat inspection confirmed entering Attack target selection highlights the default enemy slot, selecting enemy slot 2 attacks only that enemy, and enemy slot 0 HP remains unchanged.
+
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 
 ## Known Technical Debt
@@ -335,12 +499,13 @@ Older validation before the string-corruption fix also covered battle victory re
 - Some earlier handoff text and git history contain mojibake from prior Chinese display strings; current runtime UI strings are ASCII.
 - UI uses static scene nodes but still placeholder panels/colors.
 - No save/load system exists yet.
-- Automated coverage is still minimal; only the battle action order smoke test exists.
+- Timeline event portraits currently use one generated silhouette placeholder on both sides.
+- Automated coverage is still minimal; only focused smoke tests exist.
 
 ## Suggested Next Steps
 
 1. Convert JSON configs into typed Godot Resources or add schema validation.
-2. Add proper target selection for attacks, skills, and items.
+2. Add proper target selection for skills and items.
 3. Add more skill effects beyond direct damage.
 4. Add HP/MP recovery rules when ending a day.
 5. Add save/load.

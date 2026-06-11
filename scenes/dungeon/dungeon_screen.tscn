@@ -90,13 +90,10 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -460.0
-offset_top = 84.0
-offset_right = -24.0
-offset_bottom = -84.0
+anchor_left = 0.58
+anchor_top = 0.13
+anchor_right = 0.98
+anchor_bottom = 0.87
 theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
 
 [node name="EventMargin" type="MarginContainer" parent="EventPanel"]
@@ -145,9 +142,129 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
+[node name="ShopPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.08
+anchor_top = 0.12
+anchor_right = 0.92
+anchor_bottom = 0.88
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
+
+[node name="ShopMargin" type="MarginContainer" parent="ShopPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="ShopRoot" type="VBoxContainer" parent="ShopPanel/ShopMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShopHeader" type="HBoxContainer" parent="ShopPanel/ShopMargin/ShopRoot"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShopTitle" type="Label" parent="ShopPanel/ShopMargin/ShopRoot/ShopHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Market"
+
+[node name="ShopGoldLabel" type="Label" parent="ShopPanel/ShopMargin/ShopRoot/ShopHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Gold: 0"
+
+[node name="CloseShopButton" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"
+
+[node name="ShopContent" type="HBoxContainer" parent="ShopPanel/ShopMargin/ShopRoot"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="ShopList" type="VBoxContainer" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent"]
+layout_mode = 2
+custom_minimum_size = Vector2(300, 0)
+theme_override_constants/separation = 8
+
+[node name="ShopListTitle" type="Label" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Goods"
+
+[node name="ShopItemButton0" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ShopItemButton1" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ShopItemButton2" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ShopItemButton3" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ShopItemButton4" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="ShopDetailPanel" type="PanelContainer" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ShopDetailMargin" type="MarginContainer" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopDetailPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="ShopDetailRoot" type="VBoxContainer" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopDetailPanel/ShopDetailMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ShopInfoLabel" type="Label" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopDetailPanel/ShopDetailMargin/ShopDetailRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Select an item."
+autowrap_mode = 2
+
+[node name="BuyButton" type="Button" parent="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopDetailPanel/ShopDetailMargin/ShopDetailRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+disabled = true
+text = "Buy"
+
 [connection signal="pressed" from="TopMargin/TopBar/FinishButton" to="." method="_on_finish_button_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton0" to="." method="_on_choice_button_0_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton1" to="." method="_on_choice_button_1_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton2" to="." method="_on_choice_button_2_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton3" to="." method="_on_choice_button_3_pressed"]
 [connection signal="pressed" from="EventPanel/EventMargin/EventRoot/ChoiceButton4" to="." method="_on_choice_button_4_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopHeader/CloseShopButton" to="." method="_on_close_shop_button_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList/ShopItemButton0" to="." method="_on_shop_item_button_0_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList/ShopItemButton1" to="." method="_on_shop_item_button_1_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList/ShopItemButton2" to="." method="_on_shop_item_button_2_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList/ShopItemButton3" to="." method="_on_shop_item_button_3_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopList/ShopItemButton4" to="." method="_on_shop_item_button_4_pressed"]
+[connection signal="pressed" from="ShopPanel/ShopMargin/ShopRoot/ShopContent/ShopDetailPanel/ShopDetailMargin/ShopDetailRoot/BuyButton" to="." method="_on_buy_button_pressed"]

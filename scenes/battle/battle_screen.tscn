@@ -1,6 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://battle_demo_screen"]
+[gd_scene load_steps=6 format=3 uid="uid://battle_demo_screen"]
 
 [ext_resource type="Script" path="res://scripts/battle/battle_screen.gd" id="1_battle"]
+[ext_resource type="Texture2D" path="res://Assets/characters/char_chibi_adventurer_placeholder.png" id="2_party_sprite"]
+[ext_resource type="Texture2D" path="res://Assets/enemies/enemy_shadow_chibi_placeholder.png" id="3_enemy_sprite"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup_panel"]
 bg_color = Color(0.105, 0.115, 0.145, 1)
@@ -65,100 +67,409 @@ theme_override_font_sizes/font_size = 26
 text = "Battle Encounter"
 horizontal_alignment = 1
 
-[node name="BattleField" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot"]
+[node name="BattleMain" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 18
+theme_override_constants/separation = 14
 
-[node name="ActionOrderPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField"]
+[node name="ActionOrderPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain"]
 layout_mode = 2
-custom_minimum_size = Vector2(220, 0)
+custom_minimum_size = Vector2(180, 0)
 size_flags_vertical = 3
 
-[node name="ActionOrderMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel"]
+[node name="ActionOrderMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/ActionOrderPanel"]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 10
 
-[node name="ActionOrderRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin"]
+[node name="ActionOrderRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/ActionOrderPanel/ActionOrderMargin"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="ActionOrderTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
+[node name="ActionOrderTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Action Order"
 
-[node name="ActionOrderLabel" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
+[node name="ActionOrderLabel" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/ActionOrderPanel/ActionOrderMargin/ActionOrderRoot"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(180, 220)
+custom_minimum_size = Vector2(140, 180)
 size_flags_vertical = 3
 text = "Actor(0)"
 
-[node name="PartyPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField"]
+[node name="BattleStagePanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="PartyMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/PartyPanel"]
+[node name="StageMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
 
-[node name="PartyRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin"]
+[node name="StageRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PartyTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
+[node name="StageHeader" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot"]
 layout_mode = 2
+
+[node name="PartySideTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/StageHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "Party"
 
-[node name="PartyLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
-unique_name_in_owner = true
+[node name="EnemySideTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/StageHeader"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "Enemies"
+horizontal_alignment = 2
 
-[node name="PartyLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/PartyPanel/PartyMargin/PartyRoot"]
-unique_name_in_owner = true
+[node name="CombatRows" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot"]
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 28
 
-[node name="EnemyPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField"]
+[node name="PartySlots" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+theme_override_constants/separation = 6
+alignment = 1
 
-[node name="EnemyMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel"]
+[node name="PartySlot0" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
 
-[node name="EnemyRoot" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin"]
+[node name="PartyDamageLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot0"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
 
-[node name="EnemyTitle" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Enemies"
-
-[node name="EnemyLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+[node name="PartyHpBar0" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot0"]
 unique_name_in_owner = true
 layout_mode = 2
+show_percentage = false
 
-[node name="EnemyLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+[node name="PartySprite0" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot0"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("2_party_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PartyNameLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot0"]
 unique_name_in_owner = true
 layout_mode = 2
+horizontal_alignment = 1
 
-[node name="EnemyLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleField/EnemyPanel/EnemyMargin/EnemyRoot"]
+[node name="PartyStatsLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot0"]
 unique_name_in_owner = true
 layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartySlot1" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="PartyDamageLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot1"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PartyHpBar1" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="PartySprite1" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot1"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("2_party_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PartyNameLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartyStatsLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartySlot2" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="PartyDamageLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot2"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PartyHpBar2" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="PartySprite2" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("2_party_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PartyNameLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartyStatsLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartySlot3" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="PartyDamageLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot3"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="PartyHpBar3" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="PartySprite3" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot3"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("2_party_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PartyNameLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="PartyStatsLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/PartySlots/PartySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemySlots" type="VBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="EnemySlot0" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="EnemyDamageLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot0"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="EnemyHpBar0" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot0"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="EnemySprite0" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot0"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("3_enemy_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyNameLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot0"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemyStatsLabel0" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot0"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemySlot1" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="EnemyDamageLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot1"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="EnemyHpBar1" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="EnemySprite1" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot1"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("3_enemy_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyNameLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemyStatsLabel1" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot1"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemySlot2" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="EnemyDamageLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot2"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="EnemyHpBar2" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="EnemySprite2" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot2"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("3_enemy_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyNameLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemyStatsLabel2" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot2"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemySlot3" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(320, 82)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+alignment = 1
+
+[node name="EnemyDamageLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot3"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.22, 0.12, 1)
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+
+[node name="EnemyHpBar3" type="ProgressBar" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+show_percentage = false
+
+[node name="EnemySprite3" type="TextureRect" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot3"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+texture = ExtResource("3_enemy_sprite")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="EnemyNameLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="EnemyStatsLabel3" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleMain/BattleStagePanel/StageMargin/StageRoot/CombatRows/EnemySlots/EnemySlot3"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
 
 [node name="BattleLower" type="HBoxContainer" parent="BattlePanel/BattleMargin/BattleRoot"]
 layout_mode = 2
@@ -187,13 +498,13 @@ text = "Battle Log"
 [node name="BattleLog" type="Label" parent="BattlePanel/BattleMargin/BattleRoot/BattleLower/LogPanel/LogMargin/LogRoot"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(360, 84)
+custom_minimum_size = Vector2(260, 72)
 size_flags_horizontal = 3
 autowrap_mode = 2
 
 [node name="CommandPanel" type="PanelContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleLower"]
 layout_mode = 2
-custom_minimum_size = Vector2(420, 0)
+custom_minimum_size = Vector2(360, 0)
 
 [node name="CommandMargin" type="MarginContainer" parent="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel"]
 layout_mode = 2
@@ -303,6 +614,7 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 text = "Healing Potion: restore 20 HP to the active character."
+autowrap_mode = 2
 
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/SkillButton" to="." method="_on_skill_button_pressed"]

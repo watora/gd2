@@ -4,9 +4,12 @@ extends Control
 signal run_finished(rewards: Dictionary, flags: Dictionary, summary: Array[String])
 
 const BATTLE_SCREEN_SCENE := preload("res://scenes/battle/battle_screen.tscn")
+const MAP_LAYOUT_SIZE := Vector2(1152.0, 648.0)
 
 var state: Dictionary = {}
 var current_choices: Array = []
+var current_shop_goods: Array = []
+var selected_shop_index := -1
 
 @onready var _map_layer: Control = %MapLayer
 @onready var _title_label: Label = %TitleLabel
@@ -20,8 +23,14 @@ var current_choices: Array = []
 @onready var _choice_button_2: Button = %ChoiceButton2
 @onready var _choice_button_3: Button = %ChoiceButton3
 @onready var _choice_button_4: Button = %ChoiceButton4
+@onready var _shop_panel: PanelContainer = %ShopPanel
+@onready var _shop_title: Label = %ShopTitle
+@onready var _shop_gold_label: Label = %ShopGoldLabel
+@onready var _shop_info_label: Label = %ShopInfoLabel
+@onready var _buy_button: Button = %BuyButton
 
 var _choice_buttons: Array[Button] = []
+var _shop_item_buttons: Array[Button] = []
 var _event_buttons: Dictionary = {}
 var _map_textures: Dictionary = {}
 var _map_image: TextureRect
@@ -29,9 +38,9 @@ var _manager := DungeonManager.new()
 var _battle_screen: Control
 
 
-func setup(new_state: Dictionary) -> void:
+func setup(new_state: Dictionary, config_path := DungeonManager.EVENTS_CONFIG, start_map_id := "") -> void:
 	state = new_state
-	_manager.start_run(state)
+	_manager.start_run(state, config_path, start_map_id)
 	if is_inside_tree():
 		_apply_current_map()
 		_update_reward_label()
@@ -42,6 +51,7 @@ func _ready() -> void:
 	add_child(_manager)
 	_cache_scene_nodes()
 	_event_panel.visible = false
+	_shop_panel.visible = false
 	if not state.is_empty():
 		_apply_current_map()
 		_update_reward_label()
@@ -54,6 +64,13 @@ func _cache_scene_nodes() -> void:
 		_choice_button_2,
 		_choice_button_3,
 		_choice_button_4
+	]
+	_shop_item_buttons = [
+		%ShopItemButton0,
+		%ShopItemButton1,
+		%ShopItemButton2,
+		%ShopItemButton3,
+		%ShopItemButton4
 	]
 	_map_image = %MapImage
 
@@ -82,6 +99,34 @@ func _on_choice_button_4_pressed() -> void:
 	_resolve_choice_index(4)
 
 
+func _on_shop_item_button_0_pressed() -> void:
+	_select_shop_item(0)
+
+
+func _on_shop_item_button_1_pressed() -> void:
+	_select_shop_item(1)
+
+
+func _on_shop_item_button_2_pressed() -> void:
+	_select_shop_item(2)
+
+
+func _on_shop_item_button_3_pressed() -> void:
+	_select_shop_item(3)
+
+
+func _on_shop_item_button_4_pressed() -> void:
+	_select_shop_item(4)
+
+
+func _on_buy_button_pressed() -> void:
+	_buy_selected_shop_item()
+
+
+func _on_close_shop_button_pressed() -> void:
+	_close_shop()
+
+
 func _apply_current_map() -> void:
 	var map_data := _manager.current_map()
 	if map_data.is_empty():
@@ -105,10 +150,9 @@ func _rebuild_event_buttons(event_points: Array) -> void:
 		var button := Button.new()
 		button.name = "%s_button" % event_id
 		button.text = point.get("text", event_data.get("title", event_id))
-		button.position = _vector2_from_config(point.get("position", [0, 0]))
-		button.size = _vector2_from_config(point.get("size", [140, 42]))
+		_apply_event_button_anchors(button, point)
 		button.pressed.connect(_on_event_button_pressed.bind(event_id))
-		_map_layer.add_child(button)
+		_map_layer.add_child(button, true)
 		_event_buttons[event_id] = button
 
 
@@ -120,6 +164,9 @@ func _open_event(event_id: String) -> void:
 	if not _manager.has_event(event_id):
 		return
 	var event_data := _manager.event_data(event_id)
+	if event_data.has("shop"):
+		_open_shop(event_data)
+		return
 	if not _manager.is_event_repeatable(event_id) and _manager.is_event_resolved(event_id):
 		_event_title.text = "Already searched"
 		_event_body.text = event_data.get("resolved_body", "There are no new clues here.")
@@ -233,6 +280,87 @@ func _close_event() -> void:
 	_event_panel.visible = false
 
 
+func _open_shop(event_data: Dictionary) -> void:
+	_event_panel.visible = false
+	_shop_panel.visible = true
+	_shop_title.text = event_data.get("title", "Market")
+	var shop_data: Dictionary = event_data.get("shop", {})
+	current_shop_goods = shop_data.get("goods", [])
+	selected_shop_index = -1
+	_shop_info_label.text = shop_data.get("body", event_data.get("body", "Select an item."))
+	_buy_button.disabled = true
+	_refresh_shop()
+	if not current_shop_goods.is_empty():
+		_select_shop_item(0)
+
+
+func _refresh_shop() -> void:
+	_shop_gold_label.text = "Gold: %d" % int(state.get("gold", 0))
+	for index: int in range(_shop_item_buttons.size()):
+		var button := _shop_item_buttons[index]
+		if index >= current_shop_goods.size():
+			button.visible = false
+			button.disabled = true
+			button.text = ""
+			continue
+		var item: Dictionary = current_shop_goods[index]
+		var item_id := String(item.get("item_id", ""))
+		var quantity: int = max(1, int(item.get("quantity", 1)))
+		var price: int = max(0, int(item.get("price", 0)))
+		button.visible = true
+		button.disabled = item_id == ""
+		button.text = "%s x%d - %d gold" % [_item_name(item_id), quantity, price]
+
+
+func _select_shop_item(index: int) -> void:
+	if index < 0 or index >= current_shop_goods.size():
+		selected_shop_index = -1
+		_buy_button.disabled = true
+		return
+	selected_shop_index = index
+	var item: Dictionary = current_shop_goods[index]
+	var item_id := String(item.get("item_id", ""))
+	var quantity: int = max(1, int(item.get("quantity", 1)))
+	var price: int = max(0, int(item.get("price", 0)))
+	var owned: int = int(state.get("inventory", {}).get(item_id, 0))
+	var description := String(item.get("description", "A useful market good."))
+	_shop_info_label.text = "%s x%d\nPrice: %d gold\nOwned: %d\n\n%s" % [
+		_item_name(item_id),
+		quantity,
+		price,
+		owned,
+		description
+	]
+	_buy_button.text = "Buy for %d gold" % price
+	_buy_button.disabled = item_id == "" or int(state.get("gold", 0)) < price
+
+
+func _buy_selected_shop_item() -> void:
+	if selected_shop_index < 0 or selected_shop_index >= current_shop_goods.size():
+		return
+	var item: Dictionary = current_shop_goods[selected_shop_index]
+	var item_id := String(item.get("item_id", ""))
+	var quantity: int = max(1, int(item.get("quantity", 1)))
+	var price: int = max(0, int(item.get("price", 0)))
+	if item_id == "":
+		return
+	if int(state.get("gold", 0)) < price:
+		_shop_info_label.text = "Not enough gold."
+		_buy_button.disabled = true
+		return
+	state["gold"] = int(state.get("gold", 0)) - price
+	if not state["inventory"].has(item_id):
+		state["inventory"][item_id] = 0
+	state["inventory"][item_id] = int(state["inventory"].get(item_id, 0)) + quantity
+	_manager.append_summary("City: bought %s x%d at the market for %d gold." % [_item_name(item_id), quantity, price])
+	_refresh_shop()
+	_select_shop_item(selected_shop_index)
+
+
+func _close_shop() -> void:
+	_shop_panel.visible = false
+
+
 func _item_name(item_id: String) -> String:
 	return state.get("items", {}).get(item_id, {}).get("name", item_id)
 
@@ -241,6 +369,19 @@ func _vector2_from_config(value: Variant) -> Vector2:
 	if value is Array and value.size() >= 2:
 		return Vector2(float(value[0]), float(value[1]))
 	return Vector2.ZERO
+
+
+func _apply_event_button_anchors(button: Button, point: Dictionary) -> void:
+	var point_position := _vector2_from_config(point.get("position", [0, 0]))
+	var point_size := _vector2_from_config(point.get("size", [140, 42]))
+	button.anchor_left = clampf(point_position.x / MAP_LAYOUT_SIZE.x, 0.0, 1.0)
+	button.anchor_top = clampf(point_position.y / MAP_LAYOUT_SIZE.y, 0.0, 1.0)
+	button.anchor_right = clampf((point_position.x + point_size.x) / MAP_LAYOUT_SIZE.x, 0.0, 1.0)
+	button.anchor_bottom = clampf((point_position.y + point_size.y) / MAP_LAYOUT_SIZE.y, 0.0, 1.0)
+	button.offset_left = 0.0
+	button.offset_top = 0.0
+	button.offset_right = 0.0
+	button.offset_bottom = 0.0
 
 
 func _map_texture(map_data: Dictionary) -> Texture2D:

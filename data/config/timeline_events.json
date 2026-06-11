@@ -1,0 +1,105 @@
+{
+  "events": [
+    {
+      "id": "day_1_opening",
+      "day": 1,
+      "title": "First Morning Briefing",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Aki Hoshino",
+          "side": "left",
+          "text": "The frontier base is open. If we can bring back enough material, the workshop can finally start running."
+        },
+        {
+          "speaker": "Mio Kirishima",
+          "side": "right",
+          "text": "The old capital ruins are unstable, but the first route is short enough for a test expedition."
+        }
+      ]
+    },
+    {
+      "id": "day_3_supply_report",
+      "day": 3,
+      "title": "Supply Report",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Mio Kirishima",
+          "side": "right",
+          "text": "Three days of records are enough to see the pattern. Gold income is steady, but materials still decide our growth speed."
+        },
+        {
+          "speaker": "Aki Hoshino",
+          "side": "left",
+          "text": "Then we keep the dungeon route simple: gather, return, upgrade, and repeat."
+        }
+      ]
+    },
+    {
+      "id": "day_5_crystal_rumor",
+      "day": 5,
+      "title": "Crystal Gate Rumor",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Aki Hoshino",
+          "side": "left",
+          "text": "Some of the scouts mentioned blue crystal light under the old streets."
+        },
+        {
+          "speaker": "Mio Kirishima",
+          "side": "right",
+          "text": "If that gate is real, it may lead to a second resource route. We should mark it during the next expedition."
+        }
+      ]
+    },
+    {
+      "id": "city_notice_request",
+      "title": "Notice Board Request",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Guild Clerk",
+          "side": "left",
+          "text": "Explorers who can confirm safe routes beyond the city will receive priority access to frontier commissions."
+        },
+        {
+          "speaker": "Aki Hoshino",
+          "side": "right",
+          "text": "Then the world map is not just travel. It is how we choose what kind of growth the base needs next."
+        }
+      ]
+    },
+    {
+      "id": "forest_spirit_trace",
+      "title": "Forest Spirit Trace",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Mio Kirishima",
+          "side": "right",
+          "text": "The herbs form a pattern around something invisible. This forest may have older rules than the city records mention."
+        }
+      ]
+    },
+    {
+      "id": "waste_courier_tag",
+      "title": "Lost Courier Tag",
+      "left_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "right_portrait": "res://Assets/characters/char_silhouette_portrait_placeholder.png",
+      "lines": [
+        {
+          "speaker": "Aki Hoshino",
+          "side": "left",
+          "text": "This courier tag is from a supply route that never arrived. If we recover the trail, the base may gain a new source of materials."
+        }
+      ]
+    }
+  ]
+}

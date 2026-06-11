@@ -5,6 +5,8 @@ const ENEMIES_CONFIG := "res://data/config/enemies.json"
 const ACTION_VALUE_BASE := 10000
 const DEFAULT_SPEED := 100
 const MAX_ACTION_ORDER_PREVIEW := 10
+const MAX_PARTY_MEMBERS := 4
+const MAX_ACTIVE_ENEMIES := 4
 
 var state: Dictionary = {}
 var enemy_config: Dictionary = {}
@@ -12,12 +14,15 @@ var battle_rewards: Dictionary = {}
 var battle_summary := ""
 var battle_party: Array[Dictionary] = []
 var battle_enemies: Array[Dictionary] = []
+var enemy_reserves: Array[Dictionary] = []
+var defeated_enemy_exp_reward := 0
 var active_actor_index := 0
 var active_actor_side := "party"
 var action_queue: Array[Dictionary] = []
 var guarding: Dictionary = {}
 var battle_log := ""
 var pending_battle_result: Dictionary = {}
+var recent_events: Array[Dictionary] = []
 
 
 func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
@@ -27,13 +32,18 @@ func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
 	battle_summary = battle_result.get("battle_summary", "Dungeon: won a battle.")
 	battle_party = []
 	battle_enemies = []
+	enemy_reserves = []
+	defeated_enemy_exp_reward = 0
 	guarding = {}
+	recent_events = []
 	active_actor_index = 0
 	active_actor_side = "party"
 	action_queue = []
 	pending_battle_result = {}
 
 	for character: Dictionary in state["characters"]:
+		if battle_party.size() >= MAX_PARTY_MEMBERS:
+			break
 		_prepare_character_growth_fields(character)
 		_prepare_combatant_speed(character)
 		battle_party.append(character)
@@ -43,7 +53,10 @@ func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
 		if enemy_config.has(enemy_id):
 			var enemy: Dictionary = enemy_config[enemy_id].duplicate(true)
 			_prepare_combatant_speed(enemy)
-			battle_enemies.append(enemy)
+			if battle_enemies.size() < MAX_ACTIVE_ENEMIES:
+				battle_enemies.append(enemy)
+			else:
+				enemy_reserves.append(enemy)
 
 	battle_log = battle_result.get("body", "Enemies block the path.")
 	_reset_action_queue()
@@ -66,21 +79,27 @@ func active_actor_skill_ids() -> Array:
 	return active_actor().get("skills", [])
 
 
-func attack() -> Dictionary:
+func attack(target_index: int = -1) -> Dictionary:
+	recent_events = []
 	var actor := active_actor()
 	if actor.is_empty():
 		return {"status": "running", "log": battle_log}
 	guarding.erase(actor["name"])
-	var target := _first_alive_enemy()
+	if target_index < 0:
+		target_index = _first_alive_enemy_index()
+	var target := _alive_enemy_at_index(target_index)
 	if target.is_empty():
+		battle_log = "Choose a valid enemy target."
 		return {"status": "running", "log": battle_log}
 	var damage: int = max(1, int(actor["strength"]) + 3)
 	target["hp"] -= damage
+	_add_damage_event("enemy", target_index, damage)
 	battle_log = "%s attacks %s for %d damage." % [actor["name"], target["name"], damage]
 	return _after_player_action()
 
 
 func defend() -> Dictionary:
+	recent_events = []
 	var actor := active_actor()
 	if actor.is_empty():
 		return {"status": "running", "log": battle_log}
@@ -90,6 +109,7 @@ func defend() -> Dictionary:
 
 
 func use_skill(skill_id: String) -> Dictionary:
+	recent_events = []
 	var actor := active_actor()
 	if actor.is_empty():
 		return {"status": "running", "log": battle_log}
@@ -109,6 +129,7 @@ func use_skill(skill_id: String) -> Dictionary:
 	actor["mp"] = max(0, int(actor["mp"]) - mp_cost)
 	var damage := _skill_damage(actor, skill)
 	target["hp"] -= damage
+	_add_damage_event("enemy", battle_enemies.find(target), damage)
 	battle_log = "%s uses %s on %s for %d damage." % [
 		actor["name"],
 		skill.get("name", skill_id),
@@ -119,6 +140,7 @@ func use_skill(skill_id: String) -> Dictionary:
 
 
 func use_healing_potion() -> Dictionary:
+	recent_events = []
 	var potion_count := int(state["inventory"].get("healing_potion", 0))
 	if potion_count <= 0:
 		battle_log = "No healing potions remain."
@@ -187,17 +209,18 @@ func action_order_preview() -> Array[Dictionary]:
 
 
 func _after_player_action() -> Dictionary:
+	_fill_enemy_reinforcements()
 	var result: Dictionary = _check_battle_result()
 	if result["status"] != "running":
-		return result
+		return _with_recent_events(result)
 	_advance_action_queue_after_current_actor()
 	result = _check_battle_result()
 	if result["status"] != "running":
-		return result
+		return _with_recent_events(result)
 	result = _resolve_enemy_actions_until_player_ready()
 	if result["status"] != "running":
-		return result
-	return {"status": "running", "log": battle_log}
+		return _with_recent_events(result)
+	return _with_recent_events({"status": "running", "log": battle_log})
 
 
 func _resolve_enemy_actions_until_player_ready() -> Dictionary:
@@ -225,6 +248,7 @@ func _enemy_action() -> void:
 		damage = max(1, int(float(damage) / 2.0))
 		guarding.erase(target["name"])
 	target["hp"] -= damage
+	_add_damage_event("party", target_index, damage)
 	battle_log += "\n%s attacks %s for %d damage." % [enemy["name"], target["name"], damage]
 
 
@@ -246,6 +270,22 @@ func _check_battle_result() -> Dictionary:
 	return {"status": "running", "log": battle_log}
 
 
+func _add_damage_event(target_side: String, target_index: int, amount: int) -> void:
+	if target_index < 0:
+		return
+	recent_events.append({
+		"type": "damage",
+		"target_side": target_side,
+		"target_index": target_index,
+		"amount": amount
+	})
+
+
+func _with_recent_events(result: Dictionary) -> Dictionary:
+	result["events"] = recent_events.duplicate(true)
+	return result
+
+
 func _award_battle_exp() -> Array[String]:
 	var summary: Array[String] = []
 	var exp_reward := _battle_exp_reward()
@@ -263,10 +303,7 @@ func _award_battle_exp() -> Array[String]:
 
 
 func _battle_exp_reward() -> int:
-	var total := 0
-	for enemy: Dictionary in battle_enemies:
-		total += int(enemy.get("exp", 0))
-	return total
+	return defeated_enemy_exp_reward
 
 
 func _prepare_character_growth_fields(character: Dictionary) -> void:
@@ -310,6 +347,22 @@ func _first_alive_enemy() -> Dictionary:
 	return {}
 
 
+func _first_alive_enemy_index() -> int:
+	for index: int in range(battle_enemies.size()):
+		if int(battle_enemies[index].get("hp", 0)) > 0:
+			return index
+	return -1
+
+
+func _alive_enemy_at_index(index: int) -> Dictionary:
+	if index < 0 or index >= battle_enemies.size():
+		return {}
+	var enemy: Dictionary = battle_enemies[index]
+	if int(enemy.get("hp", 0)) <= 0:
+		return {}
+	return enemy
+
+
 func _is_character_alive(character: Dictionary) -> bool:
 	return int(character.get("hp", 0)) > 0
 
@@ -336,6 +389,8 @@ func _active_enemy() -> Dictionary:
 
 
 func _all_enemies_defeated() -> bool:
+	if not enemy_reserves.is_empty():
+		return false
 	for enemy: Dictionary in battle_enemies:
 		if int(enemy["hp"]) > 0:
 			return false
@@ -391,6 +446,43 @@ func _prune_action_queue() -> void:
 		if _is_action_entry_alive(entry):
 			living_entries.append(entry)
 	action_queue = living_entries
+
+
+func _fill_enemy_reinforcements() -> void:
+	var changed := false
+	for index: int in range(battle_enemies.size()):
+		var enemy: Dictionary = battle_enemies[index]
+		if enemy.is_empty() or int(enemy.get("hp", 0)) > 0:
+			continue
+		_record_defeated_enemy(enemy)
+		_remove_action_entries("enemy", index)
+		if enemy_reserves.is_empty():
+			continue
+		var replacement: Dictionary = enemy_reserves.pop_front()
+		_prepare_combatant_speed(replacement)
+		battle_enemies[index] = replacement
+		action_queue.append(_make_action_entry("enemy", index, _action_delay(replacement)))
+		battle_log += "\n%s steps in as reinforcement." % replacement.get("name", "Enemy")
+		changed = true
+	if changed:
+		_sort_action_queue()
+		_sync_active_actor_from_queue()
+
+
+func _record_defeated_enemy(enemy: Dictionary) -> void:
+	if bool(enemy.get("_defeat_recorded", false)):
+		return
+	defeated_enemy_exp_reward += int(enemy.get("exp", 0))
+	enemy["_defeat_recorded"] = true
+
+
+func _remove_action_entries(side: String, index: int) -> void:
+	var kept_entries: Array[Dictionary] = []
+	for entry: Dictionary in action_queue:
+		if String(entry.get("side", "")) == side and int(entry.get("index", -1)) == index:
+			continue
+		kept_entries.append(entry)
+	action_queue = kept_entries
 
 
 func _sort_action_queue() -> void:

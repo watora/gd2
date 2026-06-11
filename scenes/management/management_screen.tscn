@@ -94,7 +94,7 @@ alignment = 2
 [node name="StartDungeonButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1473799620]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Enter Dungeon"
+text = "Travel"
 
 [node name="CharacterButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1205082211]
 unique_name_in_owner = true
@@ -204,7 +204,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 
 [node name="Side" type="VBoxContainer" parent="ContentMargin/Root/Body" unique_id=506210634]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(260, 0)
 layout_mode = 2
 theme_override_constants/separation = 10
 
@@ -248,7 +248,7 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="JournalPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side" unique_id=1684544700]
-custom_minimum_size = Vector2(0, 280)
+custom_minimum_size = Vector2(0, 240)
 layout_mode = 2
 
 [node name="JournalMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/JournalPanel" unique_id=1162606508]
@@ -268,7 +268,7 @@ theme_override_font_sizes/font_size = 22
 text = "Journal"
 
 [node name="JournalScroll" type="ScrollContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot" unique_id=2114576351]
-custom_minimum_size = Vector2(0, 210)
+custom_minimum_size = Vector2(0, 170)
 layout_mode = 2
 horizontal_scroll_mode = 0
 
@@ -322,14 +322,10 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 1
 anchors_preset = -1
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -230.0
-offset_top = -220.0
-offset_right = 230.0
-offset_bottom = 220.0
+anchor_left = 0.2
+anchor_top = 0.15
+anchor_right = 0.8
+anchor_bottom = 0.85
 theme_override_styles/panel = SubResource("StyleBoxFlat_character_popup")
 
 [node name="CharacterMargin" type="MarginContainer" parent="CharacterPanel" unique_id=2141614600]

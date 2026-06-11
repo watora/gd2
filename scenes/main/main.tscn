@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://kwoxcpgjpncs"]
+[gd_scene load_steps=3 format=3 uid="uid://kwoxcpgjpncs"]
 
 [ext_resource type="Script" uid="uid://d3kgly80i52iq" path="res://scripts/core/main_controller.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/ui/event_dialog.tscn" id="2_event_dialog"]
 
 [node name="Main" type="Control" unique_id=1386374421]
 layout_mode = 3
@@ -10,3 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_main")
+
+[node name="EventDialog" parent="." instance=ExtResource("2_event_dialog")]
+unique_name_in_owner = true
+visible = false

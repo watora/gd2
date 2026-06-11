@@ -1,0 +1,43 @@
+{
+  "title": "Frontier World Map",
+  "background_texture": "res://Assets/bg/bg_world_map_placeholder.png",
+  "locations": [
+    {
+      "id": "frontier_city",
+      "name": "Frontier City",
+      "description": "A growing market town where rumors, supplies, and contracts gather.",
+      "config_path": "res://data/config/world_location_events.json",
+      "start_map": "frontier_city",
+      "position": [185, 210],
+      "size": [150, 44]
+    },
+    {
+      "id": "moonlit_forest",
+      "name": "Moonlit Forest",
+      "description": "A quiet forest with herbs, old trails, and beasts near the ruins.",
+      "config_path": "res://data/config/world_location_events.json",
+      "start_map": "moonlit_forest",
+      "position": [430, 160],
+      "size": [160, 44]
+    },
+    {
+      "id": "red_waste",
+      "name": "Red Waste",
+      "description": "Dry wildland scattered with ore, broken machines, and ambush points.",
+      "config_path": "res://data/config/world_location_events.json",
+      "start_map": "red_waste",
+      "position": [735, 360],
+      "size": [140, 44]
+    },
+    {
+      "id": "old_capital_dungeon",
+      "name": "Old Capital Dungeon",
+      "description": "The main dungeon route beneath the ruined old capital.",
+      "config_path": "res://data/config/dungeon_events.json",
+      "start_map": "old_capital",
+      "is_dungeon": true,
+      "position": [810, 155],
+      "size": [180, 44]
+    }
+  ]
+}

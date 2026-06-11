@@ -85,7 +85,7 @@ func _refresh() -> void:
 	_gold_label.text = "Gold: %d" % state["gold"]
 	_dungeon_label.text = "Dungeon: %s" % ("Done" if state["dungeon_used_today"] else "Available")
 	_income_label.text = "Expected daily income: %d gold" % _calculate_income()
-	_start_dungeon_button.disabled = bool(state["dungeon_used_today"])
+	_start_dungeon_button.disabled = false
 	_refresh_inventory()
 	_refresh_buildings()
 	_refresh_journal()

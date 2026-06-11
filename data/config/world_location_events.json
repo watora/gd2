@@ -1,0 +1,224 @@
+{
+  "start_map": "frontier_city",
+  "maps": {
+    "frontier_city": {
+      "title": "Frontier City",
+      "background_texture": "res://Assets/bg/bg_frontier_city_placeholder.png",
+      "event_points": [
+        {"event_id": "city_market", "text": "Market", "position": [240, 230], "size": [130, 42]},
+        {"event_id": "city_notice_board", "text": "Notice Board", "position": [520, 170], "size": [160, 42]},
+        {"event_id": "city_back_alley", "text": "Back Alley", "position": [730, 360], "size": [140, 42]}
+      ]
+    },
+    "moonlit_forest": {
+      "title": "Moonlit Forest",
+      "background_texture": "res://Assets/bg/bg_moonlit_forest_placeholder.png",
+      "event_points": [
+        {"event_id": "forest_herb_patch", "text": "Herb Patch", "position": [285, 245], "size": [150, 42]},
+        {"event_id": "forest_old_trail", "text": "Old Trail", "position": [535, 360], "size": [140, 42]},
+        {"event_id": "forest_wolf_den", "text": "Wolf Den", "position": [780, 250], "size": [130, 42]}
+      ]
+    },
+    "red_waste": {
+      "title": "Red Waste",
+      "background_texture": "res://Assets/bg/bg_red_waste_placeholder.png",
+      "event_points": [
+        {"event_id": "waste_ore_ridge", "text": "Ore Ridge", "position": [260, 340], "size": [140, 42]},
+        {"event_id": "waste_broken_cart", "text": "Broken Cart", "position": [560, 210], "size": [150, 42]},
+        {"event_id": "waste_shadow_ambush", "text": "Ambush", "position": [810, 410], "size": [130, 42]}
+      ]
+    }
+  },
+  "events": {
+    "city_market": {
+      "title": "City Market",
+      "body": "Merchants have laid out small expedition supplies beside the main road.",
+      "repeatable": true,
+      "shop": {
+        "body": "Choose supplies to buy with gold. Purchased goods are added to inventory immediately.",
+        "goods": [
+          {
+            "item_id": "healing_potion",
+            "quantity": 1,
+            "price": 12,
+            "description": "Basic medicine for the battle item command."
+          },
+          {
+            "item_id": "iron_ore",
+            "quantity": 2,
+            "price": 10,
+            "description": "Common ore used for base construction and workshop upgrades."
+          },
+          {
+            "item_id": "glowing_moss",
+            "quantity": 2,
+            "price": 14,
+            "description": "Luminous herb material gathered from forest routes."
+          },
+          {
+            "item_id": "machine_gear",
+            "quantity": 1,
+            "price": 24,
+            "description": "Old machine part needed by advanced facilities."
+          }
+        ]
+      }
+    },
+    "city_notice_board": {
+      "title": "Notice Board",
+      "body": "A fresh notice asks explorers to confirm a hidden route beyond the city gate.",
+      "resolved_body": "The notice has already been copied into the party journal.",
+      "choices": [
+        {
+          "text": "Read the sealed notice",
+          "trigger_event": "city_notice_request",
+          "flags": {"city_notice_read": true},
+          "summary": "City: read a notice about new routes outside the frontier.",
+          "result": "The notice describes tracks leading toward the red waste."
+        },
+        {
+          "text": "Take a simple delivery job",
+          "rewards": {"gold": 18},
+          "summary": "City: completed a quick delivery job.",
+          "result": "A guild clerk pays the party before the road gets crowded."
+        }
+      ]
+    },
+    "city_back_alley": {
+      "title": "Back Alley",
+      "body": "A suspicious group blocks the alley behind the trading post.",
+      "resolved_body": "The alley is quiet again.",
+      "choices": [
+        {
+          "text": "Avoid trouble and search crates",
+          "rewards": {"iron_ore": 1},
+          "summary": "City: found spare ore in abandoned alley crates.",
+          "result": "The crates hold one useful chunk of iron ore."
+        },
+        {
+          "text": "Drive off the thieves",
+          "battle": {"enemies": ["shadow_wolf"]},
+          "rewards": {"gold": 20, "iron_ore": 1},
+          "summary": "City: drove off thieves near the trading post.",
+          "result": "The group draws blades and the alley erupts into combat."
+        }
+      ]
+    },
+    "forest_herb_patch": {
+      "title": "Herb Patch",
+      "body": "Glowing herbs grow beneath a ring of pale trees.",
+      "resolved_body": "Only cut stems remain in the herb patch.",
+      "choices": [
+        {
+          "text": "Gather medicine herbs",
+          "rewards": {"glowing_moss": 2, "healing_potion": 1},
+          "summary": "Forest: gathered herbs and brewed a small potion.",
+          "result": "The herbs glow softly after they are packed away."
+        },
+        {
+          "text": "Study the growth pattern",
+          "requirements": {"intelligence": 8},
+          "trigger_event": "forest_spirit_trace",
+          "rewards": {"glowing_moss": 3},
+          "summary": "Forest: found signs of a spirit path in the herb growth.",
+          "result": "The herb ring points toward an unseen path deeper in the forest."
+        }
+      ]
+    },
+    "forest_old_trail": {
+      "title": "Old Trail",
+      "body": "Old boot marks vanish under roots and fallen leaves.",
+      "resolved_body": "The old trail has already been mapped.",
+      "choices": [
+        {
+          "text": "Map the hidden route",
+          "requirements": {"agility": 8},
+          "rewards": {"ancient_shard": 1},
+          "summary": "Forest: mapped a hidden route and found an ancient shard.",
+          "result": "The route ends at a moss-covered stone marker."
+        },
+        {
+          "text": "Follow animal tracks",
+          "rewards": {"glowing_moss": 1},
+          "summary": "Forest: followed animal tracks to a mossy clearing.",
+          "result": "The tracks lead to a small patch of usable moss."
+        }
+      ]
+    },
+    "forest_wolf_den": {
+      "title": "Wolf Den",
+      "body": "Low growls echo from a den under the roots.",
+      "resolved_body": "The den entrance has been cleared.",
+      "choices": [
+        {
+          "text": "Fight the shadow wolves",
+          "battle": {"enemies": ["shadow_wolf", "shadow_wolf"]},
+          "rewards": {"gold": 16, "glowing_moss": 1},
+          "summary": "Forest: defeated shadow wolves near the den.",
+          "result": "Two shadows rush from the den."
+        }
+      ]
+    },
+    "waste_ore_ridge": {
+      "title": "Ore Ridge",
+      "body": "Metal-rich stone cuts through the red dirt.",
+      "resolved_body": "The exposed ore has already been broken loose.",
+      "choices": [
+        {
+          "text": "Mine surface ore",
+          "rewards": {"iron_ore": 3},
+          "summary": "Wasteland: mined iron ore from the red ridge.",
+          "result": "The ridge gives up several workable ore chunks."
+        },
+        {
+          "text": "Break the heavy seam",
+          "requirements": {"strength": 8},
+          "rewards": {"iron_ore": 4, "machine_gear": 1},
+          "summary": "Wasteland: broke a heavy seam and found an old machine gear.",
+          "result": "A rusted gear falls out from the broken stone."
+        }
+      ]
+    },
+    "waste_broken_cart": {
+      "title": "Broken Cart",
+      "body": "A half-buried cart rests beside old wheel marks.",
+      "resolved_body": "The broken cart has already been searched.",
+      "choices": [
+        {
+          "text": "Search the cargo box",
+          "rewards": {"machine_gear": 1, "gold": 8},
+          "summary": "Wasteland: recovered cargo from a broken cart.",
+          "result": "The cargo box still contains a useful gear and old coins."
+        },
+        {
+          "text": "Read the courier tag",
+          "trigger_event": "waste_courier_tag",
+          "flags": {"waste_courier_tag_read": true},
+          "summary": "Wasteland: found a courier tag from a lost route.",
+          "result": "The tag names a supply route that never reached the frontier."
+        }
+      ]
+    },
+    "waste_shadow_ambush": {
+      "title": "Shadow Ambush",
+      "body": "The wind drops. Something moves behind the broken stones.",
+      "resolved_body": "The ambush point is quiet now.",
+      "choices": [
+        {
+          "text": "Stand and fight",
+          "battle": {"enemies": ["wandering_armor"]},
+          "rewards": {"gold": 22, "machine_gear": 1},
+          "summary": "Wasteland: defeated a wandering armor in the red waste.",
+          "result": "An empty armor suit rises from the dust."
+        },
+        {
+          "text": "Retreat through the dust",
+          "requirements": {"agility": 8},
+          "rewards": {"gold": 10},
+          "summary": "Wasteland: escaped an ambush and recovered scattered coins.",
+          "result": "The party slips away and gathers a dropped coin pouch."
+        }
+      ]
+    }
+  }
+}
