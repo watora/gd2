@@ -92,6 +92,7 @@ func attack(target_index: int = -1) -> Dictionary:
 		battle_log = "Choose a valid enemy target."
 		return {"status": "running", "log": battle_log}
 	var damage: int = max(1, int(actor["strength"]) + 3)
+	_add_attack_motion_event("party", active_actor_index, "enemy", target_index)
 	target["hp"] -= damage
 	_add_damage_event("enemy", target_index, damage)
 	battle_log = "%s attacks %s for %d damage." % [actor["name"], target["name"], damage]
@@ -108,13 +109,16 @@ func defend() -> Dictionary:
 	return _after_player_action()
 
 
-func use_skill(skill_id: String) -> Dictionary:
+func use_skill(skill_id: String, target_index: int = -1) -> Dictionary:
 	recent_events = []
 	var actor := active_actor()
 	if actor.is_empty():
 		return {"status": "running", "log": battle_log}
-	var target := _first_alive_enemy()
+	if target_index < 0:
+		target_index = _first_alive_enemy_index()
+	var target := _alive_enemy_at_index(target_index)
 	if target.is_empty():
+		battle_log = "Choose a valid enemy target."
 		return {"status": "running", "log": battle_log}
 	var skill := _skill_data(skill_id)
 	if skill.is_empty():
@@ -128,8 +132,16 @@ func use_skill(skill_id: String) -> Dictionary:
 	guarding.erase(actor["name"])
 	actor["mp"] = max(0, int(actor["mp"]) - mp_cost)
 	var damage := _skill_damage(actor, skill)
+	_add_attack_motion_event(
+		"party",
+		active_actor_index,
+		"enemy",
+		target_index,
+		String(skill.get("effect_texture", "")),
+		float(skill.get("effect_size", 170.0))
+	)
 	target["hp"] -= damage
-	_add_damage_event("enemy", battle_enemies.find(target), damage)
+	_add_damage_event("enemy", target_index, damage)
 	battle_log = "%s uses %s on %s for %d damage." % [
 		actor["name"],
 		skill.get("name", skill_id),
@@ -247,6 +259,7 @@ func _enemy_action() -> void:
 	if bool(guarding.get(target["name"], false)):
 		damage = max(1, int(float(damage) / 2.0))
 		guarding.erase(target["name"])
+	_add_attack_motion_event("enemy", active_actor_index, "party", target_index)
 	target["hp"] -= damage
 	_add_damage_event("party", target_index, damage)
 	battle_log += "\n%s attacks %s for %d damage." % [enemy["name"], target["name"], damage]
@@ -278,6 +291,27 @@ func _add_damage_event(target_side: String, target_index: int, amount: int) -> v
 		"target_side": target_side,
 		"target_index": target_index,
 		"amount": amount
+	})
+
+
+func _add_attack_motion_event(
+	source_side: String,
+	source_index: int,
+	target_side: String,
+	target_index: int,
+	effect_texture: String = "",
+	effect_size: float = 170.0
+) -> void:
+	if source_index < 0 or target_index < 0:
+		return
+	recent_events.append({
+		"type": "attack_motion",
+		"source_side": source_side,
+		"source_index": source_index,
+		"target_side": target_side,
+		"target_index": target_index,
+		"effect_texture": effect_texture,
+		"effect_size": effect_size
 	})
 
 
@@ -328,6 +362,7 @@ func _prepare_combatant_speed(combatant: Dictionary) -> void:
 func _level_up_character(character: Dictionary) -> String:
 	character["exp"] = int(character["exp"]) - int(character["next_exp"])
 	character["level"] = int(character["level"]) + 1
+	character["talent_points"] = int(character.get("talent_points", 0)) + 1
 	character["next_exp"] = 20 + (int(character["level"]) - 1) * 15
 	character["max_hp"] = int(character["max_hp"]) + 6
 	character["max_mp"] = int(character["max_mp"]) + 3
@@ -337,7 +372,7 @@ func _level_up_character(character: Dictionary) -> String:
 	character["speed"] = int(character.get("speed", DEFAULT_SPEED)) + 2
 	character["hp"] = int(character["max_hp"])
 	character["mp"] = int(character["max_mp"])
-	return "%s reaches Lv.%d and grows stronger." % [character["name"], character["level"]]
+	return "%s reaches Lv.%d and gains 1 talent point." % [character["name"], character["level"]]
 
 
 func _first_alive_enemy() -> Dictionary:

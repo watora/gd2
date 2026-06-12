@@ -7,6 +7,8 @@
     "base_damage": 6,
     "scaling_stat": "strength",
     "power": 2,
+    "effect_texture": "res://Assets/effects/fx_power_strike_placeholder.png",
+    "effect_size": 190,
     "description": "A heavy weapon strike that scales with STR."
   },
   "quick_cut": {
@@ -17,6 +19,8 @@
     "base_damage": 4,
     "scaling_stat": "agility",
     "power": 2,
+    "effect_texture": "res://Assets/effects/fx_quick_cut_placeholder.png",
+    "effect_size": 170,
     "description": "A fast slash that scales with AGI."
   },
   "arcane_bolt": {
@@ -27,6 +31,8 @@
     "base_damage": 5,
     "scaling_stat": "intelligence",
     "power": 2,
+    "effect_texture": "res://Assets/effects/fx_arcane_bolt_placeholder.png",
+    "effect_size": 180,
     "description": "A focused magic bolt that scales with INT."
   },
   "mana_spark": {
@@ -37,6 +43,8 @@
     "base_damage": 3,
     "scaling_stat": "intelligence",
     "power": 1,
+    "effect_texture": "res://Assets/effects/fx_mana_spark_placeholder.png",
+    "effect_size": 145,
     "description": "A low-cost spell for finishing weakened enemies."
   }
 }

@@ -5,6 +5,7 @@ signal run_finished(rewards: Dictionary, flags: Dictionary, summary: Array[Strin
 
 const BATTLE_SCREEN_SCENE := preload("res://scenes/battle/battle_screen.tscn")
 const MAP_LAYOUT_SIZE := Vector2(1152.0, 648.0)
+const CHARACTER_STATUS_PANEL_SCENE := preload("res://scenes/ui/character_status_panel.tscn")
 
 var state: Dictionary = {}
 var current_choices: Array = []
@@ -14,6 +15,7 @@ var selected_shop_index := -1
 @onready var _map_layer: Control = %MapLayer
 @onready var _title_label: Label = %TitleLabel
 @onready var _reward_label: Label = %RewardLabel
+@onready var _character_button: Button = %CharacterButton
 @onready var _finish_button: Button = %FinishButton
 @onready var _event_panel: PanelContainer = %EventPanel
 @onready var _event_title: Label = %EventTitle
@@ -36,12 +38,14 @@ var _map_textures: Dictionary = {}
 var _map_image: TextureRect
 var _manager := DungeonManager.new()
 var _battle_screen: Control
+var _character_status_panel: Variant
 
 
 func setup(new_state: Dictionary, config_path := DungeonManager.EVENTS_CONFIG, start_map_id := "") -> void:
 	state = new_state
 	_manager.start_run(state, config_path, start_map_id)
 	if is_inside_tree():
+		_setup_character_status_panel()
 		_apply_current_map()
 		_update_reward_label()
 
@@ -50,6 +54,8 @@ func _ready() -> void:
 	_manager.name = "DungeonManager"
 	add_child(_manager)
 	_cache_scene_nodes()
+	_character_button.pressed.connect(_open_character_status)
+	_create_character_status_panel()
 	_event_panel.visible = false
 	_shop_panel.visible = false
 	if not state.is_empty():
@@ -230,7 +236,10 @@ func _resolve_choice(choice: Dictionary) -> void:
 
 func _start_battle(battle_result: Dictionary) -> void:
 	_event_panel.visible = false
+	if _character_status_panel != null:
+		_character_status_panel.close()
 	_map_layer.visible = false
+	_character_button.disabled = true
 	_finish_button.disabled = true
 	_clear_battle_screen()
 	_battle_screen = BATTLE_SCREEN_SCENE.instantiate() as Control
@@ -246,6 +255,7 @@ func _on_battle_finished(result: Dictionary) -> void:
 	if String(result.get("status", "")) == "victory":
 		_manager.add_run_rewards(result.get("rewards", {}))
 		_map_layer.visible = true
+		_character_button.disabled = false
 		_finish_button.disabled = false
 		_update_reward_label()
 		return
@@ -269,6 +279,27 @@ func _update_reward_label() -> void:
 		if int(_manager.run_rewards.get(item_id, 0)) > 0:
 			parts.append("%s x%d" % [_item_name(item_id), _manager.run_rewards.get(item_id, 0)])
 	_reward_label.text = "Run rewards: " + ("None" if parts.is_empty() else ", ".join(parts))
+	if _character_status_panel != null:
+		_character_status_panel.refresh()
+
+
+func _open_character_status() -> void:
+	_setup_character_status_panel()
+	_character_status_panel.open()
+
+
+func _create_character_status_panel() -> void:
+	if _character_status_panel != null:
+		return
+	_character_status_panel = CHARACTER_STATUS_PANEL_SCENE.instantiate()
+	add_child(_character_status_panel)
+	_setup_character_status_panel()
+
+
+func _setup_character_status_panel() -> void:
+	if _character_status_panel == null or state.is_empty():
+		return
+	_character_status_panel.setup(state)
 
 
 func _finish_run() -> void:

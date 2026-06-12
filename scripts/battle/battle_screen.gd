@@ -4,6 +4,15 @@ extends Control
 signal battle_finished(result: Dictionary)
 
 const BattleManagerScript := preload("res://scripts/battle/battle_manager.gd")
+const ATTACK_LUNGE_OFFSET := 22.0
+const ATTACK_LUNGE_OUT_DURATION := 0.08
+const ATTACK_LUNGE_BACK_DURATION := 0.10
+const HIT_SHAKE_OFFSET := 8.0
+const HIT_SHAKE_STEP_DURATION := 0.045
+const BATTLE_EVENT_GAP := 0.04
+const EFFECT_FADE_IN_DURATION := 0.06
+const EFFECT_HOLD_DURATION := 0.12
+const EFFECT_FADE_OUT_DURATION := 0.10
 
 var _manager: Variant = BattleManagerScript.new()
 var _skill_choice_buttons: Array[Button] = []
@@ -17,8 +26,12 @@ var _party_stat_labels: Array[Label] = []
 var _enemy_stat_labels: Array[Label] = []
 var _party_damage_labels: Array[Label] = []
 var _enemy_damage_labels: Array[Label] = []
-var _target_selecting_attack := false
+var _target_selection_mode := ""
+var _pending_skill_id := ""
 var _selected_enemy_index := -1
+
+@export var basic_attack_effect_texture: Texture2D = preload("res://Assets/effects/fx_basic_attack_slash_placeholder.png")
+@export var basic_attack_effect_size := 170.0
 
 @onready var _battle_log: Label = %BattleLog
 @onready var _action_order_label: Label = %ActionOrderLabel
@@ -70,33 +83,35 @@ func _cache_scene_nodes() -> void:
 	for index: int in range(_enemy_slots.size()):
 		_enemy_slots[index].mouse_filter = Control.MOUSE_FILTER_STOP
 		_enemy_slots[index].gui_input.connect(_on_enemy_slot_gui_input.bind(index))
+		_enemy_slots[index].mouse_entered.connect(_on_enemy_slot_mouse_entered.bind(index))
+		_enemy_slots[index].mouse_exited.connect(_on_enemy_slot_mouse_exited.bind(index))
 
 
 func _on_attack_button_pressed() -> void:
 	_hide_command_subpanels()
 	if not _manager.active_actor_ready():
 		return
-	_begin_attack_targeting()
+	_begin_enemy_targeting("attack")
 
 
 func _on_skill_button_pressed() -> void:
-	_end_attack_targeting()
+	_end_enemy_targeting()
 	_show_battle_skills()
 
 
 func _on_defend_button_pressed() -> void:
-	_end_attack_targeting()
+	_end_enemy_targeting()
 	_hide_command_subpanels()
 	_handle_action_result(_manager.defend())
 
 
 func _on_item_button_pressed() -> void:
-	_end_attack_targeting()
+	_end_enemy_targeting()
 	_show_battle_items()
 
 
 func _on_potion_button_pressed() -> void:
-	_end_attack_targeting()
+	_end_enemy_targeting()
 	_hide_command_subpanels()
 	_handle_action_result(_manager.use_healing_potion())
 
@@ -118,13 +133,27 @@ func _on_skill_choice_button_3_pressed() -> void:
 
 
 func _on_enemy_slot_gui_input(event: InputEvent, index: int) -> void:
-	if not _target_selecting_attack:
+	if not _is_enemy_targeting():
 		return
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
 		if mouse_event.button_index != MOUSE_BUTTON_LEFT or not mouse_event.pressed:
 			return
-		_select_enemy_for_attack(index)
+		_select_enemy_target(index)
+
+
+func _on_enemy_slot_mouse_entered(index: int) -> void:
+	if not _is_enemy_targeting() or not _is_enemy_selectable(index):
+		return
+	_selected_enemy_index = index
+	_refresh_enemy_target_cues()
+
+
+func _on_enemy_slot_mouse_exited(index: int) -> void:
+	if not _is_enemy_targeting() or _selected_enemy_index != index:
+		return
+	_selected_enemy_index = -1
+	_refresh_enemy_target_cues()
 
 
 func _refresh_battle() -> void:
@@ -175,11 +204,11 @@ func _refresh_battle() -> void:
 
 	var actor_ready: bool = _manager.active_actor_ready()
 	_attack_button.disabled = not actor_ready
-	_attack_button.text = "Choose Target" if _target_selecting_attack else "Attack"
+	_attack_button.text = "Choose Target" if _target_selection_mode == "attack" else "Attack"
 	_skill_button.disabled = not (actor_ready and not _manager.active_actor_skill_ids().is_empty())
 	_defend_button.disabled = not actor_ready
 	_item_button.disabled = not actor_ready
-	_refresh_target_highlight()
+	_refresh_enemy_target_cues()
 
 
 func _refresh_action_order() -> void:
@@ -214,9 +243,9 @@ func _use_skill_index(index: int) -> void:
 	var skill_ids: Array = _manager.active_actor_skill_ids()
 	if index < 0 or index >= skill_ids.size():
 		return
-	_end_attack_targeting()
 	_hide_command_subpanels()
-	_handle_action_result(_manager.use_skill(String(skill_ids[index])))
+	_pending_skill_id = String(skill_ids[index])
+	_begin_enemy_targeting("skill")
 
 
 func _show_battle_items() -> void:
@@ -228,9 +257,10 @@ func _show_battle_items() -> void:
 
 
 func _handle_action_result(result: Dictionary) -> void:
-	_end_attack_targeting()
+	_end_enemy_targeting()
 	_battle_log.text = result.get("log", _manager.battle_log)
 	_refresh_battle()
+	_play_battle_event_effects(result.get("events", []))
 	_show_battle_events(result.get("events", []))
 	var status := String(result.get("status", "running"))
 	if status == "running":
@@ -258,36 +288,43 @@ func _hide_command_subpanels() -> void:
 	_item_panel.visible = false
 
 
-func _begin_attack_targeting() -> void:
-	_target_selecting_attack = true
-	_selected_enemy_index = _first_selectable_enemy_index()
-	_battle_log.text = "Choose an enemy target."
+func _begin_enemy_targeting(mode: String) -> void:
+	_target_selection_mode = mode
+	_selected_enemy_index = -1
+	if mode == "skill":
+		var skill_name := _pending_skill_id
+		var skill: Dictionary = _manager.skill_data(_pending_skill_id)
+		if not skill.is_empty():
+			skill_name = String(skill.get("name", _pending_skill_id))
+		_battle_log.text = "Choose a target for %s." % skill_name
+	else:
+		_pending_skill_id = ""
+		_battle_log.text = "Choose an enemy target."
 	_refresh_battle()
 
 
-func _select_enemy_for_attack(index: int) -> void:
+func _select_enemy_target(index: int) -> void:
 	if not _is_enemy_selectable(index):
 		_battle_log.text = "Choose a living enemy target."
 		return
 	_selected_enemy_index = index
-	_refresh_target_highlight()
+	_refresh_enemy_target_cues()
 	var target_index := _selected_enemy_index
-	_end_attack_targeting()
-	_handle_action_result(_manager.attack(target_index))
+	var mode := _target_selection_mode
+	var skill_id := _pending_skill_id
+	_end_enemy_targeting()
+	if mode == "skill":
+		_handle_action_result(_manager.use_skill(skill_id, target_index))
+	else:
+		_handle_action_result(_manager.attack(target_index))
 
 
-func _end_attack_targeting() -> void:
-	_target_selecting_attack = false
+func _end_enemy_targeting() -> void:
+	_target_selection_mode = ""
+	_pending_skill_id = ""
 	_selected_enemy_index = -1
 	_attack_button.text = "Attack"
-	_refresh_target_highlight()
-
-
-func _first_selectable_enemy_index() -> int:
-	for index: int in range(_enemy_slots.size()):
-		if _is_enemy_selectable(index):
-			return index
-	return -1
+	_refresh_enemy_target_cues()
 
 
 func _is_enemy_selectable(index: int) -> bool:
@@ -297,19 +334,35 @@ func _is_enemy_selectable(index: int) -> bool:
 
 
 func _enemy_name_prefix(index: int, enemy: Dictionary) -> String:
-	if _target_selecting_attack and index == _selected_enemy_index and int(enemy.get("hp", 0)) > 0:
+	if _is_enemy_targeting() and index == _selected_enemy_index and int(enemy.get("hp", 0)) > 0:
 		return "* "
 	if _manager.active_actor_side == "enemy" and index == _manager.active_actor_index and int(enemy.get("hp", 0)) > 0:
 		return "> "
 	return ""
 
 
+func _is_enemy_targeting() -> bool:
+	return _target_selection_mode != ""
+
+
+func _refresh_enemy_target_cues() -> void:
+	for index: int in range(_enemy_slots.size()):
+		if index >= _manager.battle_enemies.size():
+			continue
+		var enemy: Dictionary = _manager.battle_enemies[index]
+		_enemy_name_labels[index].text = "%s%s" % [
+			_enemy_name_prefix(index, enemy),
+			enemy["name"]
+		]
+	_refresh_target_highlight()
+
+
 func _refresh_target_highlight() -> void:
 	for index: int in range(_enemy_slots.size()):
 		var slot := _enemy_slots[index]
-		if _target_selecting_attack and index == _selected_enemy_index and _is_enemy_selectable(index):
+		if _is_enemy_targeting() and index == _selected_enemy_index and _is_enemy_selectable(index):
 			slot.modulate = Color(1.25, 1.18, 0.72, 1.0)
-		elif _target_selecting_attack and _is_enemy_selectable(index):
+		elif _is_enemy_targeting() and _is_enemy_selectable(index):
 			slot.modulate = Color(1.0, 1.0, 1.0, 1.0)
 		elif not _is_enemy_selectable(index) and index < _manager.battle_enemies.size():
 			slot.modulate = Color(0.55, 0.55, 0.55, 1.0)
@@ -332,3 +385,110 @@ func _show_damage_label(label: Label, amount: int) -> void:
 	label.text = "-%d" % amount
 	label.visible = true
 	label.modulate = Color(1, 1, 1, 1)
+
+
+func _play_battle_event_effects(events: Array) -> void:
+	var event_delay := 0.0
+	for event: Dictionary in events:
+		var event_type := String(event.get("type", ""))
+		if event_type == "attack_motion":
+			var effect_texture := String(event.get("effect_texture", ""))
+			var effect_size := float(event.get("effect_size", basic_attack_effect_size))
+			_play_attack_lunge(
+				String(event.get("source_side", "")),
+				int(event.get("source_index", -1)),
+				event_delay
+			)
+			_play_skill_effect(
+				effect_texture,
+				String(event.get("target_side", "")),
+				int(event.get("target_index", -1)),
+				effect_size,
+				event_delay + ATTACK_LUNGE_OUT_DURATION
+			)
+		elif event_type == "damage":
+			_play_hit_shake(
+				String(event.get("target_side", "")),
+				int(event.get("target_index", -1)),
+				event_delay + ATTACK_LUNGE_OUT_DURATION
+			)
+			event_delay += ATTACK_LUNGE_OUT_DURATION + max(ATTACK_LUNGE_BACK_DURATION, HIT_SHAKE_STEP_DURATION * 4.0) + BATTLE_EVENT_GAP
+
+
+func _play_attack_lunge(source_side: String, source_index: int, delay: float = 0.0) -> void:
+	var slot := _slot_for_side(source_side, source_index)
+	if slot == null or not slot.visible:
+		return
+	var direction := 1.0 if source_side == "party" else -1.0
+	var start_position := slot.position
+	var lunge_position := start_position + Vector2(ATTACK_LUNGE_OFFSET * direction, 0.0)
+	var tween := create_tween()
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(slot, "position", lunge_position, ATTACK_LUNGE_OUT_DURATION)
+	tween.tween_property(slot, "position", start_position, ATTACK_LUNGE_BACK_DURATION)
+
+
+func _play_skill_effect(texture_path: String, target_side: String, target_index: int, effect_size: float, delay: float = 0.0) -> void:
+	var slot := _slot_for_side(target_side, target_index)
+	if slot == null or not slot.visible:
+		return
+	var texture := _effect_texture(texture_path)
+	if texture == null:
+		return
+	var effect := TextureRect.new()
+	effect.texture = texture
+	effect.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	effect.size = Vector2(effect_size, effect_size)
+	effect.pivot_offset = effect.size * 0.5
+	effect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	effect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	effect.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	effect.scale = Vector2(0.85, 0.85)
+	var slot_center := slot.get_global_rect().get_center()
+	var local_center := slot_center - get_global_rect().position
+	effect.position = local_center - effect.size * 0.5
+	add_child(effect)
+
+	var tween := create_tween()
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(effect, "modulate:a", 1.0, EFFECT_FADE_IN_DURATION)
+	tween.parallel().tween_property(effect, "scale", Vector2(1.0, 1.0), EFFECT_FADE_IN_DURATION)
+	tween.tween_interval(EFFECT_HOLD_DURATION)
+	tween.tween_property(effect, "modulate:a", 0.0, EFFECT_FADE_OUT_DURATION)
+	tween.parallel().tween_property(effect, "scale", Vector2(1.08, 1.08), EFFECT_FADE_OUT_DURATION)
+	tween.tween_callback(effect.queue_free)
+
+
+func _effect_texture(texture_path: String) -> Texture2D:
+	if texture_path == "":
+		return basic_attack_effect_texture
+	var loaded := load(texture_path)
+	if loaded is Texture2D:
+		return loaded
+	return basic_attack_effect_texture
+
+
+func _play_hit_shake(target_side: String, target_index: int, delay: float = 0.0) -> void:
+	var slot := _slot_for_side(target_side, target_index)
+	if slot == null or not slot.visible:
+		return
+	var start_position := slot.position
+	var left_position := start_position + Vector2(-HIT_SHAKE_OFFSET, 0.0)
+	var right_position := start_position + Vector2(HIT_SHAKE_OFFSET, 0.0)
+	var tween := create_tween()
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(slot, "position", left_position, HIT_SHAKE_STEP_DURATION)
+	tween.tween_property(slot, "position", right_position, HIT_SHAKE_STEP_DURATION)
+	tween.tween_property(slot, "position", left_position, HIT_SHAKE_STEP_DURATION)
+	tween.tween_property(slot, "position", start_position, HIT_SHAKE_STEP_DURATION)
+
+
+func _slot_for_side(side: String, index: int) -> Control:
+	if side == "party" and index >= 0 and index < _party_slots.size():
+		return _party_slots[index]
+	if side == "enemy" and index >= 0 and index < _enemy_slots.size():
+		return _enemy_slots[index]
+	return null

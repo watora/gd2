@@ -5,6 +5,8 @@ signal start_dungeon_requested
 signal next_day_requested
 signal building_action_requested(building_id: String)
 
+const CHARACTER_STATUS_PANEL_SCENE := preload("res://scenes/ui/character_status_panel.tscn")
+
 const STAT_NAMES := {
 	"hp": "HP",
 	"mp": "MP",
@@ -27,6 +29,7 @@ var _building_rows := {}
 var _journal_labels: Array[Label] = []
 var _character_name_labels: Array[Label] = []
 var _character_stat_labels: Array[Label] = []
+var _character_status_panel: Variant
 
 @onready var _day_label: Label = %DayLabel
 @onready var _gold_label: Label = %GoldLabel
@@ -42,12 +45,14 @@ var _character_stat_labels: Array[Label] = []
 func setup(new_state: Dictionary) -> void:
 	state = new_state
 	if is_inside_tree():
+		_setup_character_status_panel()
 		_refresh()
 
 
 func _ready() -> void:
 	_cache_scene_nodes()
 	_connect_static_buttons()
+	_create_character_status_panel()
 	_refresh()
 
 
@@ -89,6 +94,8 @@ func _refresh() -> void:
 	_refresh_inventory()
 	_refresh_buildings()
 	_refresh_journal()
+	if _character_status_panel != null:
+		_character_status_panel.refresh()
 	if _character_panel.visible:
 		_refresh_character_panel()
 
@@ -125,12 +132,26 @@ func _refresh_journal() -> void:
 
 
 func _open_character_panel() -> void:
-	_refresh_character_panel()
-	_character_panel.visible = true
+	_setup_character_status_panel()
+	_character_status_panel.open()
 
 
 func _close_character_panel() -> void:
 	_character_panel.visible = false
+
+
+func _create_character_status_panel() -> void:
+	if _character_status_panel != null:
+		return
+	_character_status_panel = CHARACTER_STATUS_PANEL_SCENE.instantiate()
+	add_child(_character_status_panel)
+	_setup_character_status_panel()
+
+
+func _setup_character_status_panel() -> void:
+	if _character_status_panel == null or state.is_empty():
+		return
+	_character_status_panel.setup(state)
 
 
 func _refresh_character_panel() -> void:

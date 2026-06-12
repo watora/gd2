@@ -1,6 +1,6 @@
 # GD2 Demo Handoff
 
-Last updated: 2026-06-10
+Last updated: 2026-06-12
 
 ## Current State
 
@@ -26,6 +26,7 @@ res://
     dungeon/dungeon_screen.tscn
     battle/battle_screen.tscn
     ui/event_dialog.tscn
+    ui/character_status_panel.tscn
   scripts/
     core/main_controller.gd
     core/game_event_manager.gd
@@ -37,6 +38,7 @@ res://
     battle/battle_screen.gd
     battle/battle_manager.gd
     ui/event_dialog.gd
+    ui/character_status_panel.gd
   data/
     config/buildings.json
     config/characters.json
@@ -59,6 +61,11 @@ res://
     characters/char_silhouette_portrait_placeholder.png
     characters/char_chibi_adventurer_placeholder.png
     enemies/enemy_shadow_chibi_placeholder.png
+    effects/fx_basic_attack_slash_placeholder.png
+    effects/fx_power_strike_placeholder.png
+    effects/fx_quick_cut_placeholder.png
+    effects/fx_arcane_bolt_placeholder.png
+    effects/fx_mana_spark_placeholder.png
 ```
 
 Godot generated `.uid` files for the scripts. Keep them.
@@ -212,9 +219,16 @@ Characters currently have:
 - `intelligence`
 - `speed`
 - `skills`: an array of skill ids loaded from `data/config/characters.json`
+- `talent_points`
+- `learned_talents`
+- `talents`: per-character talent tree nodes loaded from `data/config/characters.json`
 
-The management screen has a `Character Status` button that opens a character status panel.
-The character status panel displays each character's current skill names.
+The management screen, world map, and dungeon/location screen each have a top `Character Status` button for non-battle viewing.
+All three screens instantiate `res://scenes/ui/character_status_panel.tscn`.
+The reusable character status panel lists party members on the left. Clicking a member opens the detail view on the right with current stats, EXP, skill names/descriptions/MP costs, and current inventory item counts.
+The detail view has a `Talent Tree` button. The tree view draws each configured talent node as a button with connector lines based on each node's `position` and `requires` fields.
+Learning a talent spends 1 `talent_points`, appends the node id to `learned_talents`, applies its demo `stat_bonus`, and unlocks child talents whose requirements are now learned.
+`DungeonScreen` closes and disables the character status panel when a battle starts, then re-enables it after victory returns to the map.
 
 `CharacterManager` loads and normalizes character data and skill data:
 
@@ -238,6 +252,8 @@ Skill definitions currently support:
 - `base_damage`
 - `scaling_stat`
 - `power`
+- `effect_texture`
+- `effect_size`
 - `description`
 
 Level-up behavior:
@@ -246,6 +262,7 @@ Level-up behavior:
 - If `exp >= next_exp`, the character levels up.
 - Each level up increases `max_hp`, `max_mp`, `strength`, `agility`, and `intelligence`.
 - Each level up also increases `speed` by 2.
+- Each level up grants 1 `talent_points`.
 - HP and MP are restored to the new maximum after level up.
 - Next level requirement is `20 + (level - 1) * 15`.
 
@@ -388,6 +405,8 @@ Current battle layout:
 - Each party/enemy slot uses a fixed 320x82 display size so combatant display size does not change between 1 and 4 visible combatants.
 - Bottom area: battle log and action command buttons.
 - After attacks, `BattleManager` returns damage events and `BattleScreen` displays `-N` damage text above the damaged combatant.
+- Attacks and damage skills also emit attack motion events. `BattleScreen` plays these as a short forward lunge for the attacker, then a quick left-right shake on the damaged target.
+- Attack motion events can also spawn a temporary skill-effect `TextureRect` over the target slot. Basic attacks use `fx_basic_attack_slash_placeholder.png`; configured skills read `effect_texture` and `effect_size` from `data/config/skills.json`.
 
 Current battle placeholder images:
 
@@ -404,8 +423,8 @@ Battle flow:
 4. Middle-left shows up to 4 active party members.
 5. Middle-right shows up to 4 active enemies.
 6. Active party member chooses one of `Attack`, `Skill`, `Defend`, or `Item`.
-7. `Attack` enters target selection. Clicking a living enemy slot highlights/selects that enemy and attacks that exact target.
-8. `Skill` opens the active character's configured skill list; selecting a skill spends MP and applies the configured damage formula.
+7. `Attack` enters enemy target selection. Hovering a living enemy slot moves the highlight to that enemy; clicking the slot attacks that exact target.
+8. `Skill` opens the active character's configured skill list. Selecting a damage skill enters the same enemy target selection flow, then spends MP and applies the configured damage formula to the clicked enemy.
 9. Enemy actions auto-resolve whenever an enemy is the next actor in the speed queue.
 10. If a battle config contains more than 4 enemies, only the first 4 enter the field and the rest are stored in `enemy_reserves`.
 11. When an active enemy is defeated, its EXP is recorded and the next reserve enemy enters the same slot. Victory is not checked until active enemies and reserves are all defeated.
@@ -491,6 +510,34 @@ Additional verification on 2026-06-10:
 - MCP runtime slot inspection confirmed 4 party slots and 4 enemy slots stack vertically at y positions `147/235/323/411` with fixed `(320.0, 82.0)` slot size.
 - MCP runtime combat inspection confirmed entering Attack target selection highlights the default enemy slot, selecting enemy slot 2 attacks only that enemy, and enemy slot 0 HP remains unchanged.
 
+Additional verification on 2026-06-11:
+
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed after adding a targeted skill regression check.
+- `git diff --check` passed.
+- MCP runtime script instantiated `BattleScreen`, entered Attack target selection, hovered enemy slot 2 and then enemy slot 1, and confirmed the highlight moved from slot 2 to slot 1.
+- MCP runtime script instantiated `BattleScreen`, selected a skill, clicked enemy slot 1, and confirmed enemy slot 1 HP changed `18 -> 3` while enemy slot 0 stayed `18 -> 18`.
+- Main scene short startup, `tests/unit/battle_action_order_smoke_test.gd`, and `git diff --check` passed after adding attack lunge and hit-shake battle event effects.
+- The battle unit smoke test now asserts that targeted skills return an `attack_motion` event followed by a `damage` event.
+- MCP runtime script instantiated `BattleScreen`, triggered an attack result, and confirmed the result event stream contains `attack_motion` and `damage` events for both the player attack and the auto-resolved enemy response.
+- Five image-gen VFX placeholders were generated with chroma-key backgrounds, converted to alpha PNGs, and saved under `Assets/effects/`.
+- Main scene short startup, `tests/unit/battle_action_order_smoke_test.gd`, and `git diff --check` passed after wiring skill effect textures through `data/config/skills.json`.
+- MCP runtime script instantiated `BattleScreen`, selected `Power Strike`, clicked an enemy target, and confirmed temporary effect nodes used `res://Assets/effects/fx_power_strike_placeholder.png` for the skill and `res://Assets/effects/fx_basic_attack_slash_placeholder.png` for the enemy auto-attack.
+
+Additional verification on 2026-06-12:
+
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed.
+- `git diff --check` passed.
+- MCP runtime script opened `Character Status` on the management screen, selected Aki, and confirmed the detail text includes `Stats`, `Skills`, and `Items`.
+- MCP runtime script switched to the world map, opened `Character Status`, selected Mio, and confirmed the detail text includes `Stats`, `Skills`, and `Items`.
+- MCP runtime script switched to the old capital dungeon map, opened `Character Status`, selected Aki, and confirmed the detail text includes `Stats`, `Skills`, and `Items`.
+- MCP runtime script started a battle from `DungeonScreen` and confirmed the character status panel closes and the top `Character Status` button becomes disabled during battle.
+- Main scene short startup, `tests/unit/battle_action_order_smoke_test.gd`, and `git diff --check` passed after adding per-character talent trees.
+- The battle unit smoke test now asserts that `_level_up_character()` grants 1 talent point.
+- MCP runtime script opened Aki's talent tree, confirmed it shows 6 talent buttons, learned the root `aki_battle_instinct` talent, and confirmed talent points changed `1 -> 0`, `learned_talents` contains the root id, and STR changed `7 -> 8`.
+- MCP runtime script then added 1 point after learning the root and confirmed the next branch talents `aki_blade_focus` and `aki_light_step` are learnable while deeper `aki_guard_break` remains locked.
+
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 
 ## Known Technical Debt
@@ -505,7 +552,7 @@ Older validation before the string-corruption fix also covered battle victory re
 ## Suggested Next Steps
 
 1. Convert JSON configs into typed Godot Resources or add schema validation.
-2. Add proper target selection for skills and items.
+2. Add ally target selection for battle items and future support skills.
 3. Add more skill effects beyond direct damage.
 4. Add HP/MP recovery rules when ending a day.
 5. Add save/load.

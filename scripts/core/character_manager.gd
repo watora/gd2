@@ -41,6 +41,12 @@ func _normalize_character(character: Dictionary) -> void:
 	if not character.has("speed"):
 		character["speed"] = DEFAULT_SPEED
 	character["speed"] = max(1, int(character["speed"]))
+	if not character.has("talent_points"):
+		character["talent_points"] = 0
+	if not character.has("learned_talents"):
+		character["learned_talents"] = []
+	if not character.has("talents"):
+		character["talents"] = []
 	if not character.has("skills"):
 		character["skills"] = []
 	var valid_skills: Array[String] = []

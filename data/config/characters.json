@@ -15,7 +15,59 @@
       "agility": 8,
       "intelligence": 6,
       "speed": 100,
-      "skills": ["power_strike", "quick_cut"]
+      "skills": ["power_strike", "quick_cut"],
+      "talent_points": 0,
+      "learned_talents": [],
+      "talents": [
+        {
+          "id": "aki_battle_instinct",
+          "name": "Battle Instinct",
+          "description": "Aki reads enemy movement faster. Demo effect: STR +1.",
+          "stat_bonus": {"strength": 1},
+          "requires": [],
+          "position": [260, 45]
+        },
+        {
+          "id": "aki_blade_focus",
+          "name": "Blade Focus",
+          "description": "Sharper weapon control. Demo effect: Attack damage flavor node.",
+          "stat_bonus": {"strength": 1},
+          "requires": ["aki_battle_instinct"],
+          "position": [130, 160]
+        },
+        {
+          "id": "aki_light_step",
+          "name": "Light Step",
+          "description": "Quicker footwork in ruins. Demo effect: AGI +1.",
+          "stat_bonus": {"agility": 1},
+          "requires": ["aki_battle_instinct"],
+          "position": [390, 160]
+        },
+        {
+          "id": "aki_guard_break",
+          "name": "Guard Break",
+          "description": "Power Strike feels heavier. Demo effect: Power Strike branch.",
+          "stat_bonus": {"strength": 2},
+          "requires": ["aki_blade_focus"],
+          "position": [80, 285]
+        },
+        {
+          "id": "aki_double_cut",
+          "name": "Double Cut",
+          "description": "Quick Cut training path. Demo effect: Quick Cut branch.",
+          "stat_bonus": {"agility": 2},
+          "requires": ["aki_blade_focus", "aki_light_step"],
+          "position": [260, 285]
+        },
+        {
+          "id": "aki_ruin_runner",
+          "name": "Ruin Runner",
+          "description": "Better dungeon movement. Demo effect: SPD +2.",
+          "stat_bonus": {"speed": 2},
+          "requires": ["aki_light_step"],
+          "position": [440, 285]
+        }
+      ]
     },
     {
       "id": "mio",
@@ -32,7 +84,59 @@
       "agility": 6,
       "intelligence": 9,
       "speed": 150,
-      "skills": ["arcane_bolt", "mana_spark"]
+      "skills": ["arcane_bolt", "mana_spark"],
+      "talent_points": 0,
+      "learned_talents": [],
+      "talents": [
+        {
+          "id": "mio_arcane_sense",
+          "name": "Arcane Sense",
+          "description": "Mio detects magic residue. Demo effect: INT +1.",
+          "stat_bonus": {"intelligence": 1},
+          "requires": [],
+          "position": [260, 45]
+        },
+        {
+          "id": "mio_bolt_weaving",
+          "name": "Bolt Weaving",
+          "description": "Arcane Bolt becomes more stable. Demo effect: spell branch.",
+          "stat_bonus": {"intelligence": 1},
+          "requires": ["mio_arcane_sense"],
+          "position": [130, 160]
+        },
+        {
+          "id": "mio_mana_reserve",
+          "name": "Mana Reserve",
+          "description": "Expanded casting stamina. Demo effect: Max MP +3.",
+          "stat_bonus": {"max_mp": 3, "mp": 3},
+          "requires": ["mio_arcane_sense"],
+          "position": [390, 160]
+        },
+        {
+          "id": "mio_crystal_math",
+          "name": "Crystal Math",
+          "description": "Better ruin formula reading. Demo effect: INT branch.",
+          "stat_bonus": {"intelligence": 2},
+          "requires": ["mio_bolt_weaving"],
+          "position": [80, 285]
+        },
+        {
+          "id": "mio_spark_chain",
+          "name": "Spark Chain",
+          "description": "Mana Spark follow-up training. Demo effect: spark branch.",
+          "stat_bonus": {"intelligence": 1, "speed": 1},
+          "requires": ["mio_bolt_weaving", "mio_mana_reserve"],
+          "position": [260, 285]
+        },
+        {
+          "id": "mio_spell_breath",
+          "name": "Spell Breath",
+          "description": "Calmer casting rhythm. Demo effect: SPD +2.",
+          "stat_bonus": {"speed": 2},
+          "requires": ["mio_mana_reserve"],
+          "position": [440, 285]
+        }
+      ]
     }
   ]
 }

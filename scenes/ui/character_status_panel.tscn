@@ -1,0 +1,175 @@
+[gd_scene load_steps=3 format=3 uid="uid://character_status_panel"]
+
+[ext_resource type="Script" path="res://scripts/ui/character_status_panel.gd" id="1_status"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_popup"]
+bg_color = Color(0.105, 0.115, 0.145, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.38, 0.44, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="CharacterStatusPanel" type="PanelContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.14
+anchor_top = 0.12
+anchor_right = 0.86
+anchor_bottom = 0.88
+mouse_filter = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_status_popup")
+script = ExtResource("1_status")
+
+[node name="StatusMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 14
+
+[node name="StatusRoot" type="VBoxContainer" parent="StatusMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="StatusHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot"]
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="StatusMargin/StatusRoot/StatusHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "Character Status"
+
+[node name="CloseButton" type="Button" parent="StatusMargin/StatusRoot/StatusHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Close"
+
+[node name="StatusContent" type="HBoxContainer" parent="StatusMargin/StatusRoot"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 14
+
+[node name="CharacterListPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+
+[node name="CharacterListMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="CharacterListRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CharacterListTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Characters"
+
+[node name="CharacterList" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CharacterDetailPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="CharacterDetailMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CharacterDetailRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DetailActions" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot"]
+layout_mode = 2
+alignment = 2
+
+[node name="TalentTreeButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/DetailActions"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Talent Tree"
+
+[node name="CharacterDetailScroll" type="ScrollContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CharacterDetailLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/CharacterDetailScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Select a character."
+autowrap_mode = 2
+
+[node name="TalentTreePanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="TalentTreeMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="TalentTreeRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TalentTreeHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackToDetailButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Back"
+
+[node name="TalentTreeTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+text = "Talent Tree"
+
+[node name="TalentPointsLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Points: 0"
+
+[node name="TalentTreeArea" type="Control" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(600, 360)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+clip_contents = true
+
+[node name="TalentInfoLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Select a talent."
+autowrap_mode = 2

@@ -6,30 +6,38 @@ signal return_requested
 
 const WORLD_MAP_CONFIG := "res://data/config/world_map.json"
 const WORLD_LAYOUT_SIZE := Vector2(1152.0, 648.0)
+const CHARACTER_STATUS_PANEL_SCENE := preload("res://scenes/ui/character_status_panel.tscn")
 
+var state: Dictionary = {}
 var _config: Dictionary = {}
 var _locations: Dictionary = {}
 var _selected_location: Dictionary = {}
 var _location_buttons: Dictionary = {}
 var _background_texture: Texture2D
+var _character_status_panel: Variant
 
 @onready var _map_layer: Control = %MapLayer
 @onready var _map_image: TextureRect = %MapImage
 @onready var _title_label: Label = %TitleLabel
 @onready var _description_label: Label = %DescriptionLabel
 @onready var _enter_button: Button = %EnterLocationButton
+@onready var _character_button: Button = %CharacterButton
 @onready var _return_button: Button = %ReturnBaseButton
 
 
-func setup(_state: Dictionary) -> void:
+func setup(new_state: Dictionary) -> void:
+	state = new_state
 	if is_inside_tree():
+		_setup_character_status_panel()
 		_load_world_map()
 		_refresh()
 
 
 func _ready() -> void:
 	_enter_button.pressed.connect(_enter_selected_location)
+	_character_button.pressed.connect(_open_character_status)
 	_return_button.pressed.connect(func() -> void: return_requested.emit())
+	_create_character_status_panel()
 	_load_world_map()
 	_refresh()
 
@@ -50,6 +58,27 @@ func _refresh() -> void:
 	_description_label.text = "Choose a destination."
 	_enter_button.disabled = true
 	_rebuild_location_buttons()
+	if _character_status_panel != null:
+		_character_status_panel.refresh()
+
+
+func _open_character_status() -> void:
+	_setup_character_status_panel()
+	_character_status_panel.open()
+
+
+func _create_character_status_panel() -> void:
+	if _character_status_panel != null:
+		return
+	_character_status_panel = CHARACTER_STATUS_PANEL_SCENE.instantiate()
+	add_child(_character_status_panel)
+	_setup_character_status_panel()
+
+
+func _setup_character_status_panel() -> void:
+	if _character_status_panel == null or state.is_empty():
+		return
+	_character_status_panel.setup(state)
 
 
 func _rebuild_location_buttons() -> void:
