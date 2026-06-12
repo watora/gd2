@@ -1,5 +1,7 @@
 extends SceneTree
 
+# Headless smoke test for BattleManager timing, target selection, and level-up
+# persistence. Run with Godot --headless --script from the project root.
 const BattleManagerScript := preload("res://scripts/battle/battle_manager.gd")
 
 

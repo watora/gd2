@@ -1,6 +1,9 @@
 class_name BattleManager
 extends Node
 
+# Turn-based combat rules for the demo. BattleScreen reads this manager for UI
+# state, but all HP/MP changes, rewards, EXP, reinforcements, and action timing
+# are resolved here.
 const ENEMIES_CONFIG := "res://data/config/enemies.json"
 const ACTION_VALUE_BASE := 10000
 const DEFAULT_SPEED := 100
@@ -26,6 +29,8 @@ var recent_events: Array[Dictionary] = []
 
 
 func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
+	# battle_result is produced by DungeonManager and includes encounter config,
+	# reward payload, intro text, and summary text for the dungeon journal.
 	state = new_state
 	enemy_config = _load_json(ENEMIES_CONFIG).get("enemies", {})
 	battle_rewards = battle_result.get("battle_rewards", {})
@@ -60,6 +65,8 @@ func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
 
 	battle_log = battle_result.get("body", "Enemies block the path.")
 	_reset_action_queue()
+	# Fast enemies may act before the first player turn, so resolve enemy turns
+	# until a living party member is ready or the battle ends.
 	pending_battle_result = _resolve_enemy_actions_until_player_ready()
 	if String(pending_battle_result.get("status", "running")) == "running":
 		pending_battle_result = {}
@@ -191,6 +198,8 @@ func consume_pending_battle_result() -> Dictionary:
 
 
 func action_order_preview() -> Array[Dictionary]:
+	# Simulate future turns from the current queue without mutating the real
+	# battle state. The UI uses this for the timeline preview.
 	var simulated_queue: Array[Dictionary] = []
 	for entry: Dictionary in action_queue:
 		if not _is_action_entry_alive(entry):
@@ -221,6 +230,9 @@ func action_order_preview() -> Array[Dictionary]:
 
 
 func _after_player_action() -> Dictionary:
+	# Every player command follows the same pipeline: resolve reinforcements,
+	# check battle end, advance the timing queue, then let enemies act until the
+	# next player command is available.
 	_fill_enemy_reinforcements()
 	var result: Dictionary = _check_battle_result()
 	if result["status"] != "running":
@@ -321,6 +333,8 @@ func _with_recent_events(result: Dictionary) -> Dictionary:
 
 
 func _award_battle_exp() -> Array[String]:
+	# EXP is granted directly to the shared character dictionaries, so level-ups
+	# persist when control returns to dungeon and management screens.
 	var summary: Array[String] = []
 	var exp_reward := _battle_exp_reward()
 	if exp_reward <= 0:
@@ -440,6 +454,8 @@ func _all_party_defeated() -> bool:
 
 
 func _reset_action_queue() -> void:
+	# Lower action_value acts first. Initial delay is derived from speed, so
+	# faster combatants begin closer to their first action.
 	action_queue = []
 	for index: int in range(battle_party.size()):
 		if _is_character_alive(battle_party[index]):
@@ -463,6 +479,8 @@ func _advance_action_queue_after_current_actor() -> void:
 	if action_queue.is_empty():
 		return
 	var current_entry: Dictionary = action_queue[0]
+	# Treat the active actor's remaining value as elapsed time for everyone,
+	# then schedule that same actor's next turn if still alive.
 	var elapsed := int(current_entry["action_value"])
 	for entry: Dictionary in action_queue:
 		entry["action_value"] = max(0, int(entry["action_value"]) - elapsed)
@@ -484,6 +502,8 @@ func _prune_action_queue() -> void:
 
 
 func _fill_enemy_reinforcements() -> void:
+	# Encounters can define more enemies than active slots. Defeated active slots
+	# are replaced from reserves before checking for victory.
 	var changed := false
 	for index: int in range(battle_enemies.size()):
 		var enemy: Dictionary = battle_enemies[index]

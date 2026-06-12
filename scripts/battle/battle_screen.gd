@@ -1,6 +1,9 @@
 class_name BattleScreen
 extends Control
 
+# Battle UI and animation bridge. It forwards player commands to BattleManager,
+# renders manager state, and plays lightweight effects described by manager
+# event dictionaries.
 signal battle_finished(result: Dictionary)
 
 const BattleManagerScript := preload("res://scripts/battle/battle_manager.gd")
@@ -64,6 +67,8 @@ func _ready() -> void:
 
 
 func _cache_scene_nodes() -> void:
+	# Enemy slots double as target buttons. They stay regular Control nodes so
+	# the scene can keep its layout while this script adds click/hover behavior.
 	_skill_choice_buttons = [
 		%SkillChoiceButton0,
 		%SkillChoiceButton1,
@@ -260,6 +265,8 @@ func _handle_action_result(result: Dictionary) -> void:
 	_end_enemy_targeting()
 	_battle_log.text = result.get("log", _manager.battle_log)
 	_refresh_battle()
+	# Manager events are deliberately presentation-neutral; this screen maps them
+	# to damage labels, lunges, shakes, and optional skill textures.
 	_play_battle_event_effects(result.get("events", []))
 	_show_battle_events(result.get("events", []))
 	var status := String(result.get("status", "running"))
@@ -289,6 +296,8 @@ func _hide_command_subpanels() -> void:
 
 
 func _begin_enemy_targeting(mode: String) -> void:
+	# Attack and skill share the same targeting flow. _pending_skill_id tells the
+	# final click whether to call attack() or use_skill().
 	_target_selection_mode = mode
 	_selected_enemy_index = -1
 	if mode == "skill":
@@ -445,6 +454,8 @@ func _play_skill_effect(texture_path: String, target_side: String, target_index:
 	effect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	effect.modulate = Color(1.0, 1.0, 1.0, 0.0)
 	effect.scale = Vector2(0.85, 0.85)
+	# Effects are added to the battle root and positioned from the target slot's
+	# global center so they line up even when containers resize the layout.
 	var slot_center := slot.get_global_rect().get_center()
 	var local_center := slot_center - get_global_rect().position
 	effect.position = local_center - effect.size * 0.5

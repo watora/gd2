@@ -1,6 +1,8 @@
 class_name EventDialog
 extends Control
 
+# Modal dialogue player for timeline and story events. It is kept above the
+# current screen by MainController and emits when all configured lines are done.
 signal dialog_finished(event_id: String)
 
 @export var default_portrait: Texture2D
@@ -24,6 +26,8 @@ func _ready() -> void:
 
 
 func show_event(event_data: Dictionary) -> void:
+	# Event data comes from timeline_events.json and is duplicated by
+	# GameEventManager before reaching this UI.
 	_event_data = event_data
 	_lines = event_data.get("lines", [])
 	_line_index = 0

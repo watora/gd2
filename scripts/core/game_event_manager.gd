@@ -1,6 +1,8 @@
 class_name GameEventManager
 extends Node
 
+# Read-only lookup service for timeline dialogue events. MainController decides
+# when events are queued and tracks which event ids have already fired.
 const TIMELINE_EVENTS_CONFIG := "res://data/config/timeline_events.json"
 
 var _events: Array[Dictionary] = []

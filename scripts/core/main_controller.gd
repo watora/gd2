@@ -1,6 +1,10 @@
 class_name MainController
 extends Control
 
+# Owns the demo's shared runtime state and swaps the active top-level screen.
+# Gameplay screens receive this Dictionary by reference, while this controller
+# remains responsible for day progression, rewards, building actions, and story
+# event scheduling.
 const MANAGEMENT_SCREEN_SCENE := preload("res://scenes/management/management_screen.tscn")
 const WORLD_SCREEN_SCENE := preload("res://scenes/world/world_screen.tscn")
 const DUNGEON_SCREEN_SCENE := preload("res://scenes/dungeon/dungeon_screen.tscn")
@@ -36,6 +40,8 @@ func _initialize_game_state() -> void:
 	var building_config := _load_json(BUILDINGS_CONFIG)
 	_character_manager.load_data()
 
+	# Inventory is initialized from item config so new configured items appear
+	# in the save-like state without adding more UI or controller defaults.
 	var inventory := {}
 	for item_id: String in item_config.keys():
 		inventory[item_id] = 0
@@ -110,6 +116,7 @@ func _show_location(location_data: Dictionary) -> void:
 
 
 func _finish_dungeon_run(rewards: Dictionary, flags: Dictionary, summary: Array[String]) -> void:
+	# Kept as a stable wrapper for older signal wiring and smoke tests.
 	_finish_location_run(rewards, flags, summary, true, "Old Capital Dungeon")
 
 
@@ -130,6 +137,8 @@ func _finish_location_run(
 	if not is_dungeon:
 		_add_journal("Travel: returned from %s." % location_name)
 	_show_management()
+	# Some dungeon/world choices set flags named trigger_event:<event_id>. Those
+	# flags are converted here into queued dialogue events after rewards settle.
 	_queue_triggered_events_from_flags(flags)
 
 
@@ -231,6 +240,8 @@ func _queue_timeline_events_for_day() -> void:
 
 
 func _show_next_timeline_event() -> void:
+	# Only one dialogue can be visible at a time; the queue lets multiple day
+	# events or triggered story events play in sequence.
 	if bool(_event_dialog.call("is_dialog_open")) or _timeline_event_queue.is_empty():
 		return
 	var event_data: Dictionary = _timeline_event_queue.pop_front()

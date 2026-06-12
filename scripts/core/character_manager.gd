@@ -1,6 +1,8 @@
 class_name CharacterManager
 extends Node
 
+# Loads character and skill configuration, then normalizes character records so
+# the rest of the demo can rely on required combat and growth fields.
 const CHARACTERS_CONFIG := "res://data/config/characters.json"
 const SKILLS_CONFIG := "res://data/config/skills.json"
 const DEFAULT_SPEED := 100
@@ -38,6 +40,8 @@ func has_skill(skill_id: String) -> bool:
 
 
 func _normalize_character(character: Dictionary) -> void:
+	# Config files may omit demo-era fields. Fill them here instead of scattering
+	# defaults across battle, management, and character UI code.
 	if not character.has("speed"):
 		character["speed"] = DEFAULT_SPEED
 	character["speed"] = max(1, int(character["speed"]))

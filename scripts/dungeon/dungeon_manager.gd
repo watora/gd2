@@ -1,6 +1,9 @@
 class_name DungeonManager
 extends Node
 
+# Data-driven exploration rules for a single world-location or dungeon run.
+# DungeonScreen owns presentation; this manager owns rewards, flags, resolved
+# events, travel between maps, and requirement checks.
 const EVENTS_CONFIG := "res://data/config/dungeon_events.json"
 
 const STAT_NAMES := {
@@ -73,6 +76,8 @@ func resolve_choice(choice: Dictionary) -> Dictionary:
 	if not meets_requirements(requirements):
 		return {"ok": false, "message": "The party does not meet this requirement."}
 
+	# Mark before applying the result so repeatable and one-shot events behave
+	# consistently whether they award loot, start battle, or travel to a new map.
 	_mark_choice_event_resolved(choice)
 
 	if choice.has("battle"):
@@ -90,6 +95,8 @@ func resolve_choice(choice: Dictionary) -> Dictionary:
 		for flag_name: String in choice["flags"]:
 			run_flags[flag_name] = choice["flags"][flag_name]
 	if choice.has("trigger_event"):
+		# MainController consumes this synthetic flag after the run returns to
+		# base and turns it into a queued story dialogue.
 		var event_id := String(choice["trigger_event"])
 		run_flags["trigger_event:%s" % event_id] = true
 	if choice.has("summary"):
@@ -156,6 +163,8 @@ func _load_configs() -> void:
 
 
 func _initialize_run_rewards() -> void:
+	# Include every known inventory item with zero reward so the result payload is
+	# stable even when a run finds only some material types.
 	run_rewards = {"gold": 0}
 	for item_id: String in state.get("inventory", {}):
 		run_rewards[item_id] = 0

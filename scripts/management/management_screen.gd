@@ -1,6 +1,8 @@
 class_name ManagementScreen
 extends Control
 
+# Base-management UI for the current demo loop. It displays the shared state and
+# emits intent signals; MainController performs the actual state mutations.
 signal start_dungeon_requested
 signal next_day_requested
 signal building_action_requested(building_id: String)
@@ -57,6 +59,8 @@ func _ready() -> void:
 
 
 func _cache_scene_nodes() -> void:
+	# Building rows are fixed in the scene, while their labels and action buttons
+	# are refreshed from the building config stored in state.
 	_building_rows = {
 		"guild_hall": %GuildHallRow,
 		"workshop": %WorkshopRow,
@@ -143,6 +147,8 @@ func _close_character_panel() -> void:
 func _create_character_status_panel() -> void:
 	if _character_status_panel != null:
 		return
+	# The reusable panel is instantiated once and kept as a child so base, world,
+	# dungeon, and battle screens can share the same character-detail behavior.
 	_character_status_panel = CHARACTER_STATUS_PANEL_SCENE.instantiate()
 	add_child(_character_status_panel)
 	_setup_character_status_panel()

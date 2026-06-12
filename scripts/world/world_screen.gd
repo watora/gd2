@@ -1,6 +1,8 @@
 class_name WorldScreen
 extends Control
 
+# Config-driven world map. The screen only selects a destination and emits its
+# location data; MainController decides which gameplay screen to open next.
 signal location_selected(location_data: Dictionary)
 signal return_requested
 
@@ -45,6 +47,8 @@ func _ready() -> void:
 func _load_world_map() -> void:
 	_config = _load_json(WORLD_MAP_CONFIG)
 	_locations.clear()
+	# Store locations by id for quick selection while preserving the original
+	# Dictionary payload for MainController.
 	for location_data: Dictionary in _config.get("locations", []):
 		var location_id := String(location_data.get("id", ""))
 		if location_id != "":
@@ -86,6 +90,8 @@ func _rebuild_location_buttons() -> void:
 		button.queue_free()
 	_location_buttons.clear()
 
+	# JSON positions are authored in WORLD_LAYOUT_SIZE coordinates, then converted
+	# to anchors to keep clickable destinations aligned with the map image.
 	for location_id: String in _locations:
 		var location_data: Dictionary = _locations[location_id]
 		var button := Button.new()

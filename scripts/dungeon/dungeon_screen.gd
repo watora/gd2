@@ -1,6 +1,9 @@
 class_name DungeonScreen
 extends Control
 
+# Presentation layer for map exploration. It builds buttons from location config
+# and delegates rule decisions to DungeonManager; completed runs emit rewards and
+# flags back to MainController.
 signal run_finished(rewards: Dictionary, flags: Dictionary, summary: Array[String])
 
 const BATTLE_SCREEN_SCENE := preload("res://scenes/battle/battle_screen.tscn")
@@ -148,6 +151,8 @@ func _rebuild_event_buttons(event_points: Array) -> void:
 		button.queue_free()
 	_event_buttons.clear()
 
+	# Event point positions are authored against MAP_LAYOUT_SIZE in JSON, then
+	# converted to anchors so the map stays responsive with the UI layout.
 	for point: Dictionary in event_points:
 		var event_id := String(point.get("event_id", ""))
 		if event_id == "" or not _manager.has_event(event_id):
@@ -213,6 +218,8 @@ func _resolve_choice(choice: Dictionary) -> void:
 		call(choice["method"])
 		return
 
+	# Manager returns a small result dictionary describing which presentation path
+	# to take: show text, start battle, move maps, or display an error.
 	var result := _manager.resolve_choice(choice)
 	if not bool(result.get("ok", false)):
 		_event_body.text = result.get("message", "The party cannot resolve this event.")
@@ -238,6 +245,8 @@ func _start_battle(battle_result: Dictionary) -> void:
 	_event_panel.visible = false
 	if _character_status_panel != null:
 		_character_status_panel.close()
+	# Battle temporarily replaces map interaction, but DungeonManager keeps the
+	# run rewards and summary until the final run_finished signal.
 	_map_layer.visible = false
 	_character_button.disabled = true
 	_finish_button.disabled = true
@@ -379,6 +388,8 @@ func _buy_selected_shop_item() -> void:
 		_shop_info_label.text = "Not enough gold."
 		_buy_button.disabled = true
 		return
+	# Shops spend from global gold immediately because the player is visiting a
+	# safe city/location, not collecting delayed dungeon-run rewards.
 	state["gold"] = int(state.get("gold", 0)) - price
 	if not state["inventory"].has(item_id):
 		state["inventory"][item_id] = 0

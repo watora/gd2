@@ -1,6 +1,8 @@
 class_name CharacterStatusPanel
 extends PanelContainer
 
+# Reusable character detail overlay shared by management, world, and dungeon
+# screens. It reads and mutates the shared state directly for talent learning.
 const STAT_NAMES := {
 	"hp": "HP",
 	"max_hp": "Max HP",
@@ -150,6 +152,8 @@ func _rebuild_talent_tree(character: Dictionary) -> void:
 		node.queue_free()
 	_talent_nodes.clear()
 
+	# Lines are created before buttons so prerequisite links render behind the
+	# talent buttons in the same Control area.
 	var talents: Array = character.get("talents", [])
 	var talent_by_id := _talent_map(talents)
 	for talent: Dictionary in talents:
@@ -207,6 +211,8 @@ func _learn_talent(talent_id: String) -> void:
 		character["learned_talents"] = []
 	var learned_talents: Array = character["learned_talents"]
 	learned_talents.append(talent_id)
+	# Talent bonuses are applied to runtime character state immediately; this is
+	# enough for the demo because the shared state is the active save model.
 	_apply_talent_bonus(character, talent)
 	_talent_info_label.text = "Learned %s." % talent.get("name", talent_id)
 	_show_talent_tree(_selected_character_index)
