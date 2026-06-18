@@ -32,6 +32,7 @@ var _enemy_damage_labels: Array[Label] = []
 var _target_selection_mode := ""
 var _pending_skill_id := ""
 var _selected_enemy_index := -1
+var _pending_finished_result: Dictionary = {}
 
 @export var basic_attack_effect_texture: Texture2D = preload("res://Assets/effects/fx_basic_attack_slash_placeholder.png")
 @export var basic_attack_effect_size := 170.0
@@ -47,6 +48,11 @@ var _selected_enemy_index := -1
 @onready var _item_panel: PanelContainer = %ItemPanel
 @onready var _potion_button: Button = %PotionButton
 @onready var _potion_hint: Label = %PotionHint
+@onready var _settlement_panel: PanelContainer = %SettlementPanel
+@onready var _settlement_title: Label = %SettlementTitle
+@onready var _exp_summary_label: Label = %ExpSummaryLabel
+@onready var _loot_summary_label: Label = %LootSummaryLabel
+@onready var _settlement_continue_button: Button = %SettlementContinueButton
 
 
 func setup(state: Dictionary, battle_result: Dictionary) -> void:
@@ -61,6 +67,7 @@ func _ready() -> void:
 	add_child(_manager)
 	_cache_scene_nodes()
 	_hide_command_subpanels()
+	_settlement_panel.visible = false
 	if not _manager.state.is_empty():
 		_refresh_battle()
 		_handle_pending_start_result()
@@ -119,6 +126,14 @@ func _on_potion_button_pressed() -> void:
 	_end_enemy_targeting()
 	_hide_command_subpanels()
 	_handle_action_result(_manager.use_healing_potion())
+
+
+func _on_settlement_continue_button_pressed() -> void:
+	if _pending_finished_result.is_empty():
+		return
+	var result := _pending_finished_result
+	_pending_finished_result = {}
+	battle_finished.emit(result)
 
 
 func _on_skill_choice_button_0_pressed() -> void:
@@ -273,7 +288,7 @@ func _handle_action_result(result: Dictionary) -> void:
 	if status == "running":
 		return
 	_set_battle_buttons_enabled(false)
-	battle_finished.emit(result)
+	_show_battle_settlement(result)
 
 
 func _set_battle_buttons_enabled(enabled: bool) -> void:
@@ -281,6 +296,61 @@ func _set_battle_buttons_enabled(enabled: bool) -> void:
 	_skill_button.disabled = not enabled
 	_defend_button.disabled = not enabled
 	_item_button.disabled = not enabled
+
+
+func _show_battle_settlement(result: Dictionary) -> void:
+	_pending_finished_result = result
+	_end_enemy_targeting()
+	_hide_command_subpanels()
+	_settlement_title.text = "Victory Settlement" if String(result.get("status", "")) == "victory" else "Battle Result"
+	_exp_summary_label.text = _format_exp_summary(result.get("exp_summary", []))
+	_loot_summary_label.text = _format_loot_summary(result.get("rewards", {}))
+	_settlement_continue_button.text = "Return to Dungeon" if String(result.get("status", "")) == "victory" else "Return to Base"
+	_settlement_panel.visible = true
+
+
+func _format_exp_summary(exp_summary: Array) -> String:
+	if exp_summary.is_empty():
+		return "EXP\nNo EXP gained."
+	var rows: Array[String] = ["EXP"]
+	for entry: Dictionary in exp_summary:
+		var character_name: String = String(entry.get("name", "Character"))
+		var gained_exp: int = int(entry.get("gained_exp", 0))
+		var level_before: int = int(entry.get("level_before", 1))
+		var level_after: int = int(entry.get("level_after", level_before))
+		var current_exp: int = int(entry.get("exp", 0))
+		var next_exp: int = max(1, int(entry.get("next_exp", 20)))
+		var row: String = "%s: +%d EXP  Lv.%d" % [character_name, gained_exp, level_after]
+		if level_after > level_before:
+			row += " (Lv.%d -> Lv.%d)" % [level_before, level_after]
+		row += "  %d/%d" % [current_exp, next_exp]
+		if not bool(entry.get("alive", true)) and gained_exp <= 0:
+			row += "  Down"
+		rows.append(row)
+	return "\n".join(rows)
+
+
+func _format_loot_summary(rewards: Dictionary) -> String:
+	var rows: Array[String] = ["Loot"]
+	if rewards.is_empty():
+		rows.append("No item drops.")
+		return "\n".join(rows)
+	if int(rewards.get("gold", 0)) > 0:
+		rows.append("Gold x%d" % int(rewards["gold"]))
+	for reward_id: String in rewards:
+		if reward_id == "gold":
+			continue
+		var quantity: int = int(rewards.get(reward_id, 0))
+		if quantity <= 0:
+			continue
+		rows.append("%s x%d" % [_item_name(reward_id), quantity])
+	if rows.size() == 1:
+		rows.append("No item drops.")
+	return "\n".join(rows)
+
+
+func _item_name(item_id: String) -> String:
+	return String(_manager.state.get("items", {}).get(item_id, {}).get("name", item_id))
 
 
 func _handle_pending_start_result() -> void:

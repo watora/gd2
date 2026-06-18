@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://character_status_panel"]
+[gd_scene format=3 uid="uid://5g7328flddhe"]
 
-[ext_resource type="Script" path="res://scripts/ui/character_status_panel.gd" id="1_status"]
+[ext_resource type="Script" uid="uid://touhfh4vaie3" path="res://scripts/ui/character_status_panel.gd" id="1_status"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_status_popup"]
 bg_color = Color(0.105, 0.115, 0.145, 1)
@@ -14,161 +14,159 @@ corner_radius_top_right = 6
 corner_radius_bottom_right = 6
 corner_radius_bottom_left = 6
 
-[node name="CharacterStatusPanel" type="PanelContainer"]
+[node name="CharacterStatusPanel" type="PanelContainer" unique_id=1696658036]
 unique_name_in_owner = true
 visible = false
-layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.14
 anchor_top = 0.12
 anchor_right = 0.86
 anchor_bottom = 0.88
-mouse_filter = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_status_popup")
 script = ExtResource("1_status")
 
-[node name="StatusMargin" type="MarginContainer" parent="."]
+[node name="StatusMargin" type="MarginContainer" parent="." unique_id=725874062]
 layout_mode = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 14
 
-[node name="StatusRoot" type="VBoxContainer" parent="StatusMargin"]
+[node name="StatusRoot" type="VBoxContainer" parent="StatusMargin" unique_id=1177664422]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="StatusHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot"]
+[node name="StatusHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot" unique_id=1942393121]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="StatusMargin/StatusRoot/StatusHeader"]
+[node name="TitleLabel" type="Label" parent="StatusMargin/StatusRoot/StatusHeader" unique_id=1230617607]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 24
 text = "Character Status"
 
-[node name="CloseButton" type="Button" parent="StatusMargin/StatusRoot/StatusHeader"]
+[node name="CloseButton" type="Button" parent="StatusMargin/StatusRoot/StatusHeader" unique_id=1426126645]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Close"
 
-[node name="StatusContent" type="HBoxContainer" parent="StatusMargin/StatusRoot"]
+[node name="StatusContent" type="HBoxContainer" parent="StatusMargin/StatusRoot" unique_id=138612534]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 14
 
-[node name="CharacterListPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+[node name="CharacterListPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent" unique_id=831637306]
 custom_minimum_size = Vector2(230, 0)
 layout_mode = 2
 
-[node name="CharacterListMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel"]
+[node name="CharacterListMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel" unique_id=347039064]
 layout_mode = 2
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="CharacterListRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin"]
+[node name="CharacterListRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin" unique_id=1735312229]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CharacterListTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot"]
+[node name="CharacterListTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot" unique_id=1686087207]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Characters"
 
-[node name="CharacterList" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot"]
+[node name="CharacterList" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterListPanel/CharacterListMargin/CharacterListRoot" unique_id=624757388]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="CharacterDetailPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+[node name="CharacterDetailPanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent" unique_id=1348258133]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="CharacterDetailMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel"]
+[node name="CharacterDetailMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel" unique_id=589583343]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="CharacterDetailRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin"]
+[node name="CharacterDetailRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin" unique_id=346243130]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DetailActions" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot"]
+[node name="DetailActions" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot" unique_id=2108542614]
 layout_mode = 2
 alignment = 2
 
-[node name="TalentTreeButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/DetailActions"]
+[node name="TalentTreeButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/DetailActions" unique_id=996211377]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Talent Tree"
 
-[node name="CharacterDetailScroll" type="ScrollContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot"]
+[node name="CharacterDetailScroll" type="ScrollContainer" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot" unique_id=1782714628]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="CharacterDetailLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/CharacterDetailScroll"]
+[node name="CharacterDetailLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/CharacterDetailPanel/CharacterDetailMargin/CharacterDetailRoot/CharacterDetailScroll" unique_id=1046826329]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Select a character."
 autowrap_mode = 2
 
-[node name="TalentTreePanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent"]
+[node name="TalentTreePanel" type="PanelContainer" parent="StatusMargin/StatusRoot/StatusContent" unique_id=1749731350]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="TalentTreeMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel"]
+[node name="TalentTreeMargin" type="MarginContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel" unique_id=405515174]
 layout_mode = 2
 theme_override_constants/margin_left = 12
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_right = 12
 theme_override_constants/margin_bottom = 12
 
-[node name="TalentTreeRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin"]
+[node name="TalentTreeRoot" type="VBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin" unique_id=498441578]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="TalentTreeHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+[node name="TalentTreeHeader" type="HBoxContainer" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot" unique_id=1886598915]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="BackToDetailButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+[node name="BackToDetailButton" type="Button" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader" unique_id=1254271443]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Back"
 
-[node name="TalentTreeTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+[node name="TalentTreeTitle" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader" unique_id=1171245511]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 20
 text = "Talent Tree"
 
-[node name="TalentPointsLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader"]
+[node name="TalentPointsLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot/TalentTreeHeader" unique_id=1637010182]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Points: 0"
 
-[node name="TalentTreeArea" type="Control" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+[node name="TalentTreeArea" type="Control" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot" unique_id=1152828569]
 unique_name_in_owner = true
+clip_contents = true
 custom_minimum_size = Vector2(600, 360)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-clip_contents = true
 
-[node name="TalentInfoLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot"]
+[node name="TalentInfoLabel" type="Label" parent="StatusMargin/StatusRoot/StatusContent/TalentTreePanel/TalentTreeMargin/TalentTreeRoot" unique_id=1784615507]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Select a talent."

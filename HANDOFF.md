@@ -1,6 +1,6 @@
 # GD2 Demo Handoff
 
-Last updated: 2026-06-12
+Last updated: 2026-06-18
 
 ## Current State
 
@@ -22,6 +22,7 @@ res://
   scenes/
     main/main.tscn
     management/management_screen.tscn
+    management/construction_board.tscn
     world/world_screen.tscn
     dungeon/dungeon_screen.tscn
     battle/battle_screen.tscn
@@ -32,11 +33,14 @@ res://
     core/game_event_manager.gd
     core/character_manager.gd
     management/management_screen.gd
+    management/construction_board.gd
+    management/construction_manager.gd
     world/world_screen.gd
     dungeon/dungeon_screen.gd
     dungeon/dungeon_manager.gd
     battle/battle_screen.gd
     battle/battle_manager.gd
+    battle/battle_damage_calculator.gd
     ui/event_dialog.gd
     ui/character_status_panel.gd
   data/
@@ -49,9 +53,14 @@ res://
     config/timeline_events.json
     config/world_map.json
     config/world_location_events.json
+  docs/
+    design/art_sources.md
   tests/
     unit/battle_action_order_smoke_test.gd
+    unit/construction_manager_smoke_test.gd
   Assets/
+    bg/bg_construction_border_placeholder.png
+    bg/bg_management_base_placeholder.png
     bg/bg_dungeon_old_capital_map_placeholder.png
     bg/bg_dungeon_crystal_cavern_map_placeholder.png
     bg/bg_world_map_placeholder.png
@@ -60,6 +69,10 @@ res://
     bg/bg_red_waste_placeholder.png
     characters/char_silhouette_portrait_placeholder.png
     characters/char_chibi_adventurer_placeholder.png
+    buildings/building_guild_hall_placeholder.png
+    buildings/building_workshop_placeholder.png
+    buildings/building_herb_greenhouse_placeholder.png
+    tiles/tile_construction_plot_placeholder.png
     enemies/enemy_shadow_chibi_placeholder.png
     effects/fx_basic_attack_slash_placeholder.png
     effects/fx_power_strike_placeholder.png
@@ -87,6 +100,44 @@ Lowercase target directories remain preferred for future new resource roots, but
 12. Ending the day adds building income and refreshes dungeon entry.
 13. Fixed-date timeline events can appear as bottom dialogue popups on the main scene.
 
+## Management Screen
+
+Management screen scene and script:
+
+```text
+res://scenes/management/management_screen.tscn
+res://scripts/management/management_screen.gd
+res://scenes/management/construction_board.tscn
+res://scripts/management/construction_board.gd
+res://scripts/management/construction_manager.gd
+```
+
+Construction is a separate reusable scene embedded by `ManagementScreen`.
+It uses separate top-down edge and cell assets:
+
+```text
+res://Assets/bg/bg_construction_border_placeholder.png
+res://Assets/tiles/tile_construction_plot_placeholder.png
+```
+
+The management screen keeps resources and journal visible while `ConstructionBoard` owns the construction workflow:
+
+- The left catalog selects a building definition and shows build cost/details.
+- The center map creates its grid from runtime `width` and `height`; current config starts at 5x5 and the same scene supports 6x6.
+- Clicking an empty cell places the selected type. The selection remains active, so the same building type can be placed repeatedly.
+- Clicking an occupied cell selects that specific building instance and exposes its level, income, upgrade cost, and `Upgrade` button in the left panel.
+- Hovering an occupied cell shows only the building name near the pointer.
+
+Building definitions still reference these placeholder sprites:
+
+```text
+res://Assets/buildings/building_guild_hall_placeholder.png
+res://Assets/buildings/building_workshop_placeholder.png
+res://Assets/buildings/building_herb_greenhouse_placeholder.png
+```
+
+`ConstructionManager` owns bounds/occupancy checks, material payment, instance IDs, placement, per-instance upgrade, grid resizing, and daily-income aggregation.
+
 ## State Model
 
 Runtime state lives in `scripts/core/main_controller.gd` in `game_state`.
@@ -104,7 +155,8 @@ Current state categories:
 - `flags`
 - `triggered_timeline_events`
 - `journal`
-- `buildings`
+- `building_definitions`
+- `construction` (`width`, `height`, `next_instance_id`, `placements`)
 - `items`
 
 The current config files and scene labels use ASCII display text. Later iterations can move display strings into localization files.
@@ -286,9 +338,11 @@ Building definitions are loaded from `res://data/config/buildings.json`.
 
 Current buildings:
 
-- `guild_hall`: built at start, provides daily gold income, can be upgraded.
-- `workshop`: not built at start, requires `machine_gear` and `iron_ore`.
-- `herb_garden`: not built at start, requires `glowing_moss`.
+- `guild_hall`: one instance starts at cell `(2, 2)`; additional instances cost materials.
+- `workshop`: repeatable, requires `machine_gear` and `iron_ore`.
+- `herb_garden`: repeatable, requires `glowing_moss`.
+
+Definitions are immutable config. Runtime placement and level live per instance in `game_state["construction"]["placements"]`.
 
 ## Dungeon
 
@@ -382,10 +436,12 @@ Scripts:
 ```text
 res://scripts/battle/battle_screen.gd
 res://scripts/battle/battle_manager.gd
+res://scripts/battle/battle_damage_calculator.gd
 ```
 
 `BattleScreen` owns battle UI display and input forwarding.
-`BattleManager` owns battle calculation, enemy config loading, speed-based action value ordering, skill use, item use, enemy actions, victory/defeat checks, rewards, and EXP growth.
+`BattleManager` owns battle flow, enemy config loading, speed-based action value ordering, skill use, item use, enemy actions, victory/defeat checks, rewards, and EXP growth.
+`BattleDamageCalculator` owns current damage formulas for party basic attacks, enemy basic attacks, skill damage, and guard mitigation so future modifiers can be extended outside `BattleManager`.
 `DungeonScreen` instantiates `BattleScreen` when a dungeon event choice returns a `battle` result, then listens for `battle_finished(result: Dictionary)`.
 
 Characters and enemies have a `speed` field. The action value delay is:
@@ -428,8 +484,9 @@ Battle flow:
 9. Enemy actions auto-resolve whenever an enemy is the next actor in the speed queue.
 10. If a battle config contains more than 4 enemies, only the first 4 enter the field and the rest are stored in `enemy_reserves`.
 11. When an active enemy is defeated, its EXP is recorded and the next reserve enemy enters the same slot. Victory is not checked until active enemies and reserves are all defeated.
-12. Victory emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
-13. Defeat emits a defeat result to `DungeonScreen`, ending the dungeon run and returning to base.
+12. Victory opens a battle settlement panel before leaving the battle scene. The panel lists each party member's EXP result and the battle rewards/drop items.
+13. Clicking `Return to Dungeon` on the settlement panel emits battle rewards and EXP summary to `DungeonScreen`, then returns to the dungeon map.
+14. Defeat opens the same settlement flow with zero EXP/drop context; clicking `Return to Base` emits the defeat result, ending the dungeon run and returning to base.
 
 Current battle choices:
 
@@ -437,6 +494,14 @@ Current battle choices:
 - `Challenge the shrine guardian`
 
 During battle, the top `Return to Base` button is disabled to prevent leaving before combat resolves.
+
+Current damage formulas:
+
+```text
+party basic attack damage = strength + 3, minimum 1
+enemy basic attack damage = strength + 2, minimum 1
+guarded incoming damage = int(damage * 0.5), minimum 1
+```
 
 Current skill damage formula:
 
@@ -537,6 +602,46 @@ Additional verification on 2026-06-12:
 - The battle unit smoke test now asserts that `_level_up_character()` grants 1 talent point.
 - MCP runtime script opened Aki's talent tree, confirmed it shows 6 talent buttons, learned the root `aki_battle_instinct` talent, and confirmed talent points changed `1 -> 0`, `learned_talents` contains the root id, and STR changed `7 -> 8`.
 - MCP runtime script then added 1 point after learning the root and confirmed the next branch talents `aki_blade_focus` and `aki_light_step` are learnable while deeper `aki_guard_break` remains locked.
+
+Additional verification on 2026-06-16:
+
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed and now verifies battle EXP settlement data includes each party member, with downed members listed at 0 EXP.
+- `git diff --check` passed.
+- MCP runtime script instantiated `BattleScreen`, forced a victory settlement with `Gold x5` and `Iron Ore x1`, and confirmed the settlement panel stayed visible before confirmation.
+- MCP runtime script confirmed the settlement text includes the party member EXP row plus gold and item loot rows.
+- MCP runtime script clicked `Return to Dungeon` and confirmed `battle_finished` emitted only after that click, allowing the battle screen to close afterward.
+- Generated `res://Assets/bg/bg_management_base_placeholder.png` with the built-in image generation tool and recorded the source in `docs/design/art_sources.md`.
+- Godot editor headless import passed with `--headless --path . --editor --quit` after adding the management background asset.
+- Main scene short startup passed again with the map-based management screen.
+- MCP runtime inspection confirmed `BaseImage.texture` loads `res://Assets/bg/bg_management_base_placeholder.png` and that `GuildHallRow`, `WorkshopRow`, and `HerbGardenRow` are visible over the background map.
+- MCP runtime inspection confirmed the guild upgrade button initially shows `Cost: Iron Ore x2` after fixing int-based upgrade-cost key lookup.
+- MCP runtime click verification upgraded the guild to `Lv.2/3`, updated the building list effect text to `Income +24 gold/day`, and showed the next upgrade cost.
+- Generated transparent placeholder building sprites for guild hall, repair workshop, and herb greenhouse under `res://Assets/buildings/`, then recorded their sources in `docs/design/art_sources.md`.
+- Godot editor headless import passed after adding the building sprite assets.
+- Main scene short startup passed after restructuring the management screen into a left building list and center building map.
+- MCP runtime inspection confirmed the left building list owns the action buttons and costs, while `GuildHallSpot` initially shows only the built guild sprite on the map and unbuilt workshop/greenhouse sprites stay hidden.
+- MCP runtime signal verification confirmed hovering `GuildHallSpot` shows `BuildingTooltip` with `Adventurer Guild`, mouse exit hides it, and hovering unbuilt `WorkshopSpot` leaves the tooltip hidden.
+- MCP runtime click verification built the repair workshop from the left list; `WorkshopSpot/BuildingImage` became visible with `res://Assets/buildings/building_workshop_placeholder.png`, the left list changed to `Lv.1/2` and `Upgrade`, and hover showed `Repair Workshop`.
+
+Additional verification on 2026-06-17:
+
+- Added `res://scripts/battle/battle_damage_calculator.gd` and Godot-generated `.uid`.
+- Moved party basic attack, enemy basic attack, skill damage, and guard mitigation formulas out of `BattleManager` into `BattleDamageCalculator`.
+- `tests/unit/battle_action_order_smoke_test.gd` passed and now verifies the extracted damage calculator formulas.
+- Main scene short startup passed with `--headless --path . --quit-after 2`.
+- `git diff --check` passed.
+
+Additional verification on 2026-06-18:
+
+- Added the standalone `ConstructionBoard` scene and pure `ConstructionManager` logic class.
+- Added separate generated top-down border and reusable construction-cell placeholder textures.
+- `tests/unit/construction_manager_smoke_test.gd` passed for duplicate building types, occupied-cell rejection, per-instance upgrades, income aggregation, and 5x5 to 6x6 resizing.
+- Main scene headless startup passed.
+- MCP runtime inspection confirmed a 5x5 map renders 25 cells and the configured guild instance.
+- MCP runtime interaction built a second guild instance, deducted its materials, and preserved the selected build type.
+- MCP runtime resizing rebuilt the board as 6 columns and 36 cells without overflow.
+- MCP runtime interaction selected the original guild, upgraded only that instance to Lv.2, and updated combined daily income.
 
 Older validation before the string-corruption fix also covered battle victory rewards, EXP gain, potion use, and returning dungeon rewards to base.
 

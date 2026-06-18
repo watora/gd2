@@ -1,0 +1,161 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/management/construction_board.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://Assets/bg/bg_construction_border_placeholder.png" id="2_border"]
+[ext_resource type="Texture2D" path="res://Assets/tiles/tile_construction_plot_placeholder.png" id="3_cell"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.075, 0.085, 0.1, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34, 0.37, 0.42, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+bg_color = Color(0.05, 0.055, 0.065, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.78, 0.7, 0.48, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="ConstructionBoard" type="Control"]
+custom_minimum_size = Vector2(760, 460)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+cell_texture = ExtResource("3_cell")
+
+[node name="Root" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 12
+
+[node name="CatalogPanel" type="PanelContainer" parent="Root"]
+custom_minimum_size = Vector2(230, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="CatalogMargin" type="MarginContainer" parent="Root/CatalogPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="CatalogRoot" type="VBoxContainer" parent="Root/CatalogPanel/CatalogMargin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CatalogTitle" type="Label" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "Build"
+
+[node name="CatalogList" type="VBoxContainer" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Separator" type="HSeparator" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+layout_mode = 2
+
+[node name="SelectionTitle" type="Label" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Construction"
+
+[node name="SelectionInfo" type="Label" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "Select a building type or click an existing building."
+autowrap_mode = 2
+
+[node name="UpgradeButton" type="Button" parent="Root/CatalogPanel/CatalogMargin/CatalogRoot"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "Upgrade"
+
+[node name="MapPanel" type="PanelContainer" parent="Root"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="MapArea" type="Control" parent="Root/MapPanel"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(500, 460)
+layout_mode = 2
+clip_contents = true
+
+[node name="EdgeBackground" type="TextureRect" parent="Root/MapPanel/MapArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_border")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="GridCenter" type="CenterContainer" parent="Root/MapPanel/MapArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 34.0
+offset_top = 34.0
+offset_right = -34.0
+offset_bottom = -34.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ConstructionGrid" type="GridContainer" parent="Root/MapPanel/MapArea/GridCenter"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 5
+
+[node name="BuildingTooltip" type="PanelContainer" parent="Root/MapPanel/MapArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_right = 150.0
+offset_bottom = 34.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
+
+[node name="TooltipMargin" type="MarginContainer" parent="Root/MapPanel/MapArea/BuildingTooltip"]
+layout_mode = 2
+theme_override_constants/margin_left = 9
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 9
+theme_override_constants/margin_bottom = 5
+
+[node name="TooltipLabel" type="Label" parent="Root/MapPanel/MapArea/BuildingTooltip/TooltipMargin"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Building"

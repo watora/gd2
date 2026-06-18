@@ -616,6 +616,70 @@ layout_mode = 2
 text = "Healing Potion: restore 20 HP to the active character."
 autowrap_mode = 2
 
+[node name="SettlementPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -180.0
+offset_right = 300.0
+offset_bottom = 180.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_popup_panel")
+
+[node name="SettlementMargin" type="MarginContainer" parent="SettlementPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 16
+
+[node name="SettlementRoot" type="VBoxContainer" parent="SettlementPanel/SettlementMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SettlementTitle" type="Label" parent="SettlementPanel/SettlementMargin/SettlementRoot"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Victory Settlement"
+horizontal_alignment = 1
+
+[node name="SettlementColumns" type="HBoxContainer" parent="SettlementPanel/SettlementMargin/SettlementRoot"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="ExpSummaryLabel" type="Label" parent="SettlementPanel/SettlementMargin/SettlementRoot/SettlementColumns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(270, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "EXP"
+autowrap_mode = 2
+
+[node name="LootSummaryLabel" type="Label" parent="SettlementPanel/SettlementMargin/SettlementRoot/SettlementColumns"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(230, 190)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Loot"
+autowrap_mode = 2
+
+[node name="SettlementContinueButton" type="Button" parent="SettlementPanel/SettlementMargin/SettlementRoot"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+text = "Return to Dungeon"
+
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/AttackButton" to="." method="_on_attack_button_pressed"]
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/SkillButton" to="." method="_on_skill_button_pressed"]
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/BattleActions/DefendButton" to="." method="_on_defend_button_pressed"]
@@ -625,3 +689,4 @@ autowrap_mode = 2
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton2" to="." method="_on_skill_choice_button_2_pressed"]
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/SkillPanel/SkillMargin/SkillRoot/SkillChoiceButton3" to="." method="_on_skill_choice_button_3_pressed"]
 [connection signal="pressed" from="BattlePanel/BattleMargin/BattleRoot/BattleLower/CommandPanel/CommandMargin/CommandRoot/ItemPanel/ItemMargin/ItemRoot/PotionButton" to="." method="_on_potion_button_pressed"]
+[connection signal="pressed" from="SettlementPanel/SettlementMargin/SettlementRoot/SettlementContinueButton" to="." method="_on_settlement_continue_button_pressed"]

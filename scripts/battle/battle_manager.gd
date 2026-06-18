@@ -5,6 +5,7 @@ extends Node
 # state, but all HP/MP changes, rewards, EXP, reinforcements, and action timing
 # are resolved here.
 const ENEMIES_CONFIG := "res://data/config/enemies.json"
+const DAMAGE_CALCULATOR_SCRIPT := preload("res://scripts/battle/battle_damage_calculator.gd")
 const ACTION_VALUE_BASE := 10000
 const DEFAULT_SPEED := 100
 const MAX_ACTION_ORDER_PREVIEW := 10
@@ -26,6 +27,7 @@ var guarding: Dictionary = {}
 var battle_log := ""
 var pending_battle_result: Dictionary = {}
 var recent_events: Array[Dictionary] = []
+var damage_calculator: BattleDamageCalculator = DAMAGE_CALCULATOR_SCRIPT.new()
 
 
 func start_battle(new_state: Dictionary, battle_result: Dictionary) -> void:
@@ -98,7 +100,7 @@ func attack(target_index: int = -1) -> Dictionary:
 	if target.is_empty():
 		battle_log = "Choose a valid enemy target."
 		return {"status": "running", "log": battle_log}
-	var damage: int = max(1, int(actor["strength"]) + 3)
+	var damage := damage_calculator.basic_attack_damage(actor, "party")
 	_add_attack_motion_event("party", active_actor_index, "enemy", target_index)
 	target["hp"] -= damage
 	_add_damage_event("enemy", target_index, damage)
@@ -138,7 +140,7 @@ func use_skill(skill_id: String, target_index: int = -1) -> Dictionary:
 
 	guarding.erase(actor["name"])
 	actor["mp"] = max(0, int(actor["mp"]) - mp_cost)
-	var damage := _skill_damage(actor, skill)
+	var damage := damage_calculator.skill_damage(actor, skill)
 	_add_attack_motion_event(
 		"party",
 		active_actor_index,
@@ -267,9 +269,9 @@ func _enemy_action() -> void:
 	if target_index < 0:
 		return
 	var target: Dictionary = battle_party[target_index]
-	var damage: int = max(1, int(enemy["strength"]) + 2)
+	var damage := damage_calculator.basic_attack_damage(enemy, "enemy")
 	if bool(guarding.get(target["name"], false)):
-		damage = max(1, int(float(damage) / 2.0))
+		damage = damage_calculator.guarded_damage(damage)
 		guarding.erase(target["name"])
 	_add_attack_motion_event("enemy", active_actor_index, "party", target_index)
 	target["hp"] -= damage
@@ -280,18 +282,27 @@ func _enemy_action() -> void:
 func _check_battle_result() -> Dictionary:
 	if _all_enemies_defeated():
 		var summary := [battle_summary]
-		summary.append_array(_award_battle_exp())
+		var exp_summary := _award_battle_exp()
+		for entry: Dictionary in exp_summary:
+			for line: String in entry.get("summary_lines", []):
+				summary.append(line)
 		battle_log += "\nVictory."
 		return {
 			"status": "victory",
 			"log": battle_log,
 			"rewards": battle_rewards,
+			"exp_summary": exp_summary,
 			"summary": summary
 		}
 	if _all_party_defeated():
 		var summary := ["Dungeon: the party was defeated and forced back to base."]
 		battle_log += "\nDefeat. Exploration ends."
-		return {"status": "defeat", "log": battle_log, "summary": summary}
+		return {
+			"status": "defeat",
+			"log": battle_log,
+			"exp_summary": _empty_exp_summary(),
+			"summary": summary
+		}
 	return {"status": "running", "log": battle_log}
 
 
@@ -332,21 +343,55 @@ func _with_recent_events(result: Dictionary) -> Dictionary:
 	return result
 
 
-func _award_battle_exp() -> Array[String]:
+func _award_battle_exp() -> Array[Dictionary]:
 	# EXP is granted directly to the shared character dictionaries, so level-ups
 	# persist when control returns to dungeon and management screens.
-	var summary: Array[String] = []
+	var summary: Array[Dictionary] = []
 	var exp_reward := _battle_exp_reward()
-	if exp_reward <= 0:
-		return summary
 	for character: Dictionary in battle_party:
-		if not _is_character_alive(character):
-			continue
 		_prepare_character_growth_fields(character)
+		var entry := {
+			"name": String(character.get("name", "Character")),
+			"gained_exp": 0,
+			"level_before": int(character.get("level", 1)),
+			"level_after": int(character.get("level", 1)),
+			"exp": int(character.get("exp", 0)),
+			"next_exp": int(character.get("next_exp", 20)),
+			"alive": _is_character_alive(character),
+			"summary_lines": []
+		}
+		if not _is_character_alive(character):
+			summary.append(entry)
+			continue
+		if exp_reward <= 0:
+			summary.append(entry)
+			continue
 		character["exp"] = int(character["exp"]) + exp_reward
-		summary.append("%s gains %d EXP." % [character["name"], exp_reward])
+		entry["gained_exp"] = exp_reward
+		entry["summary_lines"].append("%s gains %d EXP." % [character["name"], exp_reward])
 		while int(character["exp"]) >= int(character["next_exp"]):
-			summary.append(_level_up_character(character))
+			entry["summary_lines"].append(_level_up_character(character))
+		entry["level_after"] = int(character.get("level", 1))
+		entry["exp"] = int(character.get("exp", 0))
+		entry["next_exp"] = int(character.get("next_exp", 20))
+		summary.append(entry)
+	return summary
+
+
+func _empty_exp_summary() -> Array[Dictionary]:
+	var summary: Array[Dictionary] = []
+	for character: Dictionary in battle_party:
+		_prepare_character_growth_fields(character)
+		summary.append({
+			"name": String(character.get("name", "Character")),
+			"gained_exp": 0,
+			"level_before": int(character.get("level", 1)),
+			"level_after": int(character.get("level", 1)),
+			"exp": int(character.get("exp", 0)),
+			"next_exp": int(character.get("next_exp", 20)),
+			"alive": _is_character_alive(character),
+			"summary_lines": []
+		})
 	return summary
 
 
@@ -601,14 +646,6 @@ func _entry_combatant(entry: Dictionary) -> Dictionary:
 
 func _skill_data(skill_id: String) -> Dictionary:
 	return state.get("skills", {}).get(skill_id, {})
-
-
-func _skill_damage(actor: Dictionary, skill: Dictionary) -> int:
-	var stat_id := String(skill.get("scaling_stat", "intelligence"))
-	var stat_value := int(actor.get(stat_id, 0))
-	var base_damage := int(skill.get("base_damage", 0))
-	var power := int(skill.get("power", 1))
-	return max(1, base_damage + stat_value * power)
 
 
 func _load_json(path: String) -> Dictionary:

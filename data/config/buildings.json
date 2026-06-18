@@ -1,13 +1,25 @@
 {
+  "grid": {
+    "width": 5,
+    "height": 5
+  },
+  "initial_placements": [
+    {
+      "id": "building_1",
+      "building_id": "guild_hall",
+      "cell_x": 2,
+      "cell_y": 2,
+      "level": 1
+    }
+  ],
   "buildings": {
     "guild_hall": {
       "name": "Adventurer Guild",
       "description": "Organizes exploration teams and provides stable gold income.",
-      "built": true,
-      "level": 1,
       "max_level": 3,
       "income_gold": 12,
-      "build_cost": {},
+      "texture": "res://Assets/buildings/building_guild_hall_placeholder.png",
+      "build_cost": {"iron_ore": 2, "ancient_shard": 1},
       "upgrade_costs": {
         "1": {"iron_ore": 2},
         "2": {"iron_ore": 3, "ancient_shard": 1}
@@ -16,10 +28,9 @@
     "workshop": {
       "name": "Repair Workshop",
       "description": "Restores dungeon relics and increases daily gold income.",
-      "built": false,
-      "level": 0,
       "max_level": 2,
       "income_gold": 18,
+      "texture": "res://Assets/buildings/building_workshop_placeholder.png",
       "build_cost": {"machine_gear": 1, "iron_ore": 1},
       "upgrade_costs": {
         "1": {"machine_gear": 1, "ancient_shard": 1}
@@ -28,10 +39,9 @@
     "herb_garden": {
       "name": "Herb Greenhouse",
       "description": "Cultivates glowing moss and turns herbs into gold.",
-      "built": false,
-      "level": 0,
       "max_level": 2,
       "income_gold": 15,
+      "texture": "res://Assets/buildings/building_herb_greenhouse_placeholder.png",
       "build_cost": {"glowing_moss": 2},
       "upgrade_costs": {
         "1": {"glowing_moss": 3, "iron_ore": 1}

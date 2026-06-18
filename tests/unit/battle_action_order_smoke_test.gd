@@ -3,6 +3,7 @@ extends SceneTree
 # Headless smoke test for BattleManager timing, target selection, and level-up
 # persistence. Run with Godot --headless --script from the project root.
 const BattleManagerScript := preload("res://scripts/battle/battle_manager.gd")
+const BattleDamageCalculatorScript := preload("res://scripts/battle/battle_damage_calculator.gd")
 
 
 func _init() -> void:
@@ -55,6 +56,8 @@ func _init() -> void:
 	manager.free()
 	_assert_skill_targets_selected_enemy()
 	_assert_level_up_grants_talent_point()
+	_assert_exp_summary_lists_each_party_member()
+	_assert_damage_calculator_formulas()
 	quit()
 
 
@@ -150,3 +153,76 @@ func _assert_level_up_grants_talent_point() -> void:
 		quit(1)
 		return
 	manager.free()
+
+
+func _assert_exp_summary_lists_each_party_member() -> void:
+	var manager: BattleManager = BattleManagerScript.new()
+	manager.battle_party = [
+		{
+			"name": "Frontliner",
+			"level": 1,
+			"exp": 0,
+			"next_exp": 20,
+			"hp": 10,
+			"max_hp": 10,
+			"mp": 0,
+			"max_mp": 0
+		},
+		{
+			"name": "Downed Mage",
+			"level": 1,
+			"exp": 0,
+			"next_exp": 20,
+			"hp": 0,
+			"max_hp": 10,
+			"mp": 0,
+			"max_mp": 0
+		}
+	]
+	manager.defeated_enemy_exp_reward = 12
+	var exp_summary := manager._award_battle_exp()
+	if exp_summary.size() != 2:
+		push_error("EXP settlement should include each battle party member.")
+		manager.free()
+		quit(1)
+		return
+	if int(exp_summary[0].get("gained_exp", 0)) != 12:
+		push_error("Living character should receive the battle EXP reward.")
+		manager.free()
+		quit(1)
+		return
+	if int(exp_summary[1].get("gained_exp", 0)) != 0 or bool(exp_summary[1].get("alive", true)):
+		push_error("Downed character should be listed with 0 EXP and alive=false.")
+		manager.free()
+		quit(1)
+		return
+	manager.free()
+
+
+func _assert_damage_calculator_formulas() -> void:
+	var calculator: RefCounted = BattleDamageCalculatorScript.new()
+	var actor := {
+		"strength": 4,
+		"intelligence": 6
+	}
+	var skill := {
+		"base_damage": 5,
+		"scaling_stat": "intelligence",
+		"power": 2
+	}
+	if calculator.basic_attack_damage(actor, "party") != 7:
+		push_error("Party basic attack damage should be strength + 3.")
+		quit(1)
+		return
+	if calculator.basic_attack_damage(actor, "enemy") != 6:
+		push_error("Enemy basic attack damage should be strength + 2.")
+		quit(1)
+		return
+	if calculator.skill_damage(actor, skill) != 17:
+		push_error("Skill damage should be base_damage + scaling stat * power.")
+		quit(1)
+		return
+	if calculator.guarded_damage(7) != 3:
+		push_error("Guarded damage should preserve the current integer half-damage behavior.")
+		quit(1)
+		return

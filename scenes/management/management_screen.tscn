@@ -1,20 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://dc10g05brgidh"]
 
-[ext_resource type="Script" uid="uid://bpmqiumniglu0" path="res://scripts/management/management_screen.gd" id="1_management"]
+[ext_resource type="Script" path="res://scripts/management/management_screen.gd" id="1_management"]
+[ext_resource type="PackedScene" path="res://scenes/management/construction_board.tscn" id="2_construction"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_character_popup"]
-bg_color = Color(0.12, 0.13, 0.16, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.36, 0.38, 0.44, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[node name="ManagementScreen" type="Control" unique_id=1831288723]
+[node name="ManagementScreen" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,355 +12,204 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_management")
 
-[node name="Background" type="ColorRect" parent="." unique_id=2143838226]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.09, 0.1, 0.13, 1)
+color = Color(0.075, 0.085, 0.105, 1)
 
-[node name="ContentMargin" type="MarginContainer" parent="." unique_id=1278836137]
+[node name="ContentMargin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 12
 
-[node name="Root" type="VBoxContainer" parent="ContentMargin" unique_id=21082268]
+[node name="Root" type="VBoxContainer" parent="ContentMargin"]
 layout_mode = 2
-theme_override_constants/separation = 14
+theme_override_constants/separation = 8
 
-[node name="TitleLabel" type="Label" parent="ContentMargin/Root" unique_id=964535425]
+[node name="Header" type="HBoxContainer" parent="ContentMargin/Root"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_override_constants/separation = 12
+
+[node name="TitleLabel" type="Label" parent="ContentMargin/Root/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
 text = "Frontier Base"
-horizontal_alignment = 1
 
-[node name="StatsBar" type="HBoxContainer" parent="ContentMargin/Root" unique_id=1964366805]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="DayLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=1920699837]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="GoldLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=2042590517]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="DungeonLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=1278305958]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="IncomeLabel" type="Label" parent="ContentMargin/Root/StatsBar" unique_id=903657323]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-horizontal_alignment = 1
-
-[node name="ActionsBar" type="HBoxContainer" parent="ContentMargin/Root" unique_id=204009604]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 2
-
-[node name="StartDungeonButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1473799620]
+[node name="StartDungeonButton" type="Button" parent="ContentMargin/Root/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Travel"
 
-[node name="CharacterButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=1205082211]
+[node name="CharacterButton" type="Button" parent="ContentMargin/Root/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Character Status"
 
-[node name="NextDayButton" type="Button" parent="ContentMargin/Root/ActionsBar" unique_id=248490411]
+[node name="NextDayButton" type="Button" parent="ContentMargin/Root/Header"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "End Day"
 
-[node name="Body" type="HBoxContainer" parent="ContentMargin/Root" unique_id=1659121044]
+[node name="StatsBar" type="HBoxContainer" parent="ContentMargin/Root"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DayLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="DungeonLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="IncomeLabel" type="Label" parent="ContentMargin/Root/StatsBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 1
+
+[node name="Body" type="HBoxContainer" parent="ContentMargin/Root"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 14
-
-[node name="BuildingPanel" type="PanelContainer" parent="ContentMargin/Root/Body" unique_id=897034807]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="BuildingMargin" type="MarginContainer" parent="ContentMargin/Root/Body/BuildingPanel" unique_id=1356359632]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="BuildingRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin" unique_id=1669781632]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="BuildingTitle" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=27533293]
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Buildings"
-
-[node name="GuildHallRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=73237395]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=108351402]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=1725361539]
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow" unique_id=1653189919]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow" unique_id=2059398407]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/GuildHallRow/ActionRow" unique_id=1271574416]
-layout_mode = 2
-
-[node name="WorkshopRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=642277976]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=91919968]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=769222443]
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow" unique_id=1805638724]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow" unique_id=2030717692]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/WorkshopRow/ActionRow" unique_id=108413705]
-layout_mode = 2
-
-[node name="HerbGardenRow" type="VBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot" unique_id=1851532350]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="NameLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=700705053]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
-
-[node name="DescLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=388974589]
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="ActionRow" type="HBoxContainer" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow" unique_id=1913876259]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="CostLabel" type="Label" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow" unique_id=678432635]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="ActionButton" type="Button" parent="ContentMargin/Root/Body/BuildingPanel/BuildingMargin/BuildingRoot/HerbGardenRow/ActionRow" unique_id=110501639]
-layout_mode = 2
-
-[node name="Side" type="VBoxContainer" parent="ContentMargin/Root/Body" unique_id=506210634]
-custom_minimum_size = Vector2(260, 0)
-layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="InventoryPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side" unique_id=235755752]
+[node name="ConstructionBoard" parent="ContentMargin/Root/Body" instance=ExtResource("2_construction")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Side" type="VBoxContainer" parent="ContentMargin/Root/Body"]
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="InventoryPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side"]
 layout_mode = 2
 
-[node name="InventoryMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel" unique_id=1173852166]
+[node name="InventoryMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
 
-[node name="InventoryRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin" unique_id=777802594]
+[node name="InventoryRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="InventoryTitle" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=26413390]
+[node name="InventoryTitle" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 19
 text = "Inventory"
 
-[node name="AncientShardLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=160216896]
+[node name="AncientShardLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="IronOreLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=524381744]
+[node name="IronOreLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="GlowingMossLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=483335772]
+[node name="GlowingMossLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MachineGearLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=912980630]
+[node name="MachineGearLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HealingPotionLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot" unique_id=155395429]
+[node name="HealingPotionLabel" type="Label" parent="ContentMargin/Root/Body/Side/InventoryPanel/InventoryMargin/InventoryRoot"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="JournalPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side" unique_id=1684544700]
-custom_minimum_size = Vector2(0, 240)
+[node name="JournalPanel" type="PanelContainer" parent="ContentMargin/Root/Body/Side"]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="JournalMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/JournalPanel" unique_id=1162606508]
+[node name="JournalMargin" type="MarginContainer" parent="ContentMargin/Root/Body/Side/JournalPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
 
-[node name="JournalRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin" unique_id=125006208]
+[node name="JournalRoot" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="JournalTitle" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot" unique_id=2147254635]
+[node name="JournalTitle" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 19
 text = "Journal"
 
-[node name="JournalScroll" type="ScrollContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot" unique_id=2114576351]
-custom_minimum_size = Vector2(0, 170)
+[node name="JournalScroll" type="ScrollContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot"]
 layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="JournalEntries" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll" unique_id=2133164071]
+[node name="JournalEntries" type="VBoxContainer" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+theme_override_constants/separation = 4
 
-[node name="JournalLabel0" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1762650812]
+[node name="JournalLabel0" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel1" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1594398297]
+[node name="JournalLabel1" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel2" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=726394969]
+[node name="JournalLabel2" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel3" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=307400654]
+[node name="JournalLabel3" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel4" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=267211459]
+[node name="JournalLabel4" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel5" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=2052870058]
+[node name="JournalLabel5" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel6" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1385817945]
+[node name="JournalLabel6" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2
 
-[node name="JournalLabel7" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries" unique_id=1218683909]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="CharacterPanel" type="PanelContainer" parent="." unique_id=2009140056]
-unique_name_in_owner = true
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.2
-anchor_top = 0.15
-anchor_right = 0.8
-anchor_bottom = 0.85
-theme_override_styles/panel = SubResource("StyleBoxFlat_character_popup")
-
-[node name="CharacterMargin" type="MarginContainer" parent="CharacterPanel" unique_id=2141614600]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 14
-
-[node name="CharacterRoot" type="VBoxContainer" parent="CharacterPanel/CharacterMargin" unique_id=827163868]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="CharacterHeader" type="HBoxContainer" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=653772006]
-layout_mode = 2
-
-[node name="CharacterTitle" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader" unique_id=1565427254]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "Character Status"
-
-[node name="CloseCharacterButton" type="Button" parent="CharacterPanel/CharacterMargin/CharacterRoot/CharacterHeader" unique_id=258833915]
-unique_name_in_owner = true
-layout_mode = 2
-text = "Close"
-
-[node name="CharacterOneNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=429868669]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="CharacterOneStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=626001505]
-unique_name_in_owner = true
-layout_mode = 2
-autowrap_mode = 2
-
-[node name="CharacterOneSeparator" type="HSeparator" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=1793673097]
-layout_mode = 2
-
-[node name="CharacterTwoNameLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=97223308]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-
-[node name="CharacterTwoStatsLabel" type="Label" parent="CharacterPanel/CharacterMargin/CharacterRoot" unique_id=774268817]
+[node name="JournalLabel7" type="Label" parent="ContentMargin/Root/Body/Side/JournalPanel/JournalMargin/JournalRoot/JournalScroll/JournalEntries"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 2

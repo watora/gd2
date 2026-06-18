@@ -9,6 +9,7 @@ const MANAGEMENT_SCREEN_SCENE := preload("res://scenes/management/management_scr
 const WORLD_SCREEN_SCENE := preload("res://scenes/world/world_screen.tscn")
 const DUNGEON_SCREEN_SCENE := preload("res://scenes/dungeon/dungeon_screen.tscn")
 const GAME_EVENT_MANAGER_SCRIPT := preload("res://scripts/core/game_event_manager.gd")
+const CONSTRUCTION_MANAGER_SCRIPT := preload("res://scripts/management/construction_manager.gd")
 
 const BUILDINGS_CONFIG := "res://data/config/buildings.json"
 const ITEMS_CONFIG := "res://data/config/items.json"
@@ -16,6 +17,7 @@ const ITEMS_CONFIG := "res://data/config/items.json"
 var game_state: Dictionary = {}
 var _current_screen: Control
 var _character_manager := CharacterManager.new()
+var _construction_manager = CONSTRUCTION_MANAGER_SCRIPT.new()
 var _game_event_manager: Node
 var _timeline_event_queue: Array[Dictionary] = []
 
@@ -57,7 +59,8 @@ func _initialize_game_state() -> void:
 		"flags": {},
 		"triggered_timeline_events": [],
 		"journal": ["Day 1: The frontier base is ready. One dungeon run is available."],
-		"buildings": building_config.get("buildings", {}).duplicate(true),
+		"building_definitions": building_config.get("buildings", {}).duplicate(true),
+		"construction": _construction_manager.create_state(building_config),
 		"items": item_config.duplicate(true)
 	}
 
@@ -71,7 +74,8 @@ func _show_management() -> void:
 	screen.setup(game_state)
 	screen.start_dungeon_requested.connect(_show_world)
 	screen.next_day_requested.connect(_advance_day)
-	screen.building_action_requested.connect(_handle_building_action)
+	screen.building_place_requested.connect(_handle_building_place)
+	screen.building_upgrade_requested.connect(_handle_building_upgrade)
 
 
 func _show_world() -> void:
@@ -153,49 +157,20 @@ func _advance_day() -> void:
 	_queue_timeline_events_for_day()
 
 
-func _handle_building_action(building_id: String) -> void:
-	var building: Dictionary = game_state["buildings"][building_id]
-	var cost := _building_action_cost(building)
-	var action_name := "Build" if not bool(building["built"]) else "Upgrade"
-
-	if _is_building_done(building):
-		_add_journal("%s is already at max level." % building["name"])
-		_show_management()
-		return
-
-	if not _has_items(cost):
-		_add_journal("%s %s failed: dungeon materials are not enough." % [action_name, building["name"]])
-		_show_management()
-		return
-
-	_pay_items(cost)
-	if not bool(building["built"]):
-		building["built"] = true
-		building["level"] = 1
-	else:
-		building["level"] = int(building["level"]) + 1
-
-	_add_journal("%s %s complete. Current level: Lv.%d." % [action_name, building["name"], building["level"]])
-	_show_management()
+func _handle_building_place(building_id: String, cell: Vector2i) -> void:
+	var result: Dictionary = _construction_manager.place_building(game_state, building_id, cell)
+	_add_journal(String(result["message"]))
+	_refresh_management()
 
 
-func _building_action_cost(building: Dictionary) -> Dictionary:
-	if not bool(building["built"]):
-		return building.get("build_cost", {})
-	return building.get("upgrade_costs", {}).get(str(building["level"]), {})
-
-
-func _is_building_done(building: Dictionary) -> bool:
-	return bool(building["built"]) and int(building["level"]) >= int(building["max_level"])
+func _handle_building_upgrade(instance_id: String) -> void:
+	var result: Dictionary = _construction_manager.upgrade_building(game_state, instance_id)
+	_add_journal(String(result["message"]))
+	_refresh_management()
 
 
 func _calculate_daily_income() -> int:
-	var total := 0
-	for building_id: String in game_state["buildings"]:
-		var building: Dictionary = game_state["buildings"][building_id]
-		if bool(building["built"]):
-			total += int(building["income_gold"]) * int(building["level"])
-	return total
+	return _construction_manager.calculate_daily_income(game_state)
 
 
 func _add_rewards(rewards: Dictionary) -> void:
@@ -209,22 +184,15 @@ func _add_rewards(rewards: Dictionary) -> void:
 		game_state["inventory"][reward_id] += int(rewards[reward_id])
 
 
-func _has_items(cost: Dictionary) -> bool:
-	for item_id: String in cost:
-		if int(game_state["inventory"].get(item_id, 0)) < int(cost[item_id]):
-			return false
-	return true
-
-
-func _pay_items(cost: Dictionary) -> void:
-	for item_id: String in cost:
-		game_state["inventory"][item_id] -= int(cost[item_id])
-
-
 func _add_journal(text: String) -> void:
 	game_state["journal"].push_front(text)
 	if game_state["journal"].size() > 8:
 		game_state["journal"].resize(8)
+
+
+func _refresh_management() -> void:
+	if is_instance_valid(_current_screen) and _current_screen is ManagementScreen:
+		_current_screen.refresh()
 
 
 func _queue_timeline_events_for_day() -> void:
